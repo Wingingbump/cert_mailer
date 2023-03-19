@@ -1,10 +1,4 @@
-﻿using Microsoft.Graph;
-using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic.Devices;
-using System.Net.Sockets;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.Xml;
+﻿using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 
@@ -18,7 +12,7 @@ namespace cert_mailer
         public string Body { get; set; }
         public string CertificatePath { get; set; }
 
-        public EmailBuilder(string recipient, string courseName, string courseId, string certificatePath)
+        public EmailBuilder(string recipient,  string courseName, string courseId, string certificatePath)
         {
             Recipient = recipient;
             Subject = SubjectBuilder(courseName, courseId);
@@ -90,7 +84,7 @@ namespace cert_mailer
 
         private string SignatureBuilder()
         {
-            string signatureTemplate = GetTemplateContent("C:\\Users\\Rocke\\source\\repos\\cert_mailer\\template.htm");
+            string signatureTemplate = GetTemplateContent(@"C:\Users\Tommy\source\repos\Wingingbump\cert_mailer\template.htm");
             signatureTemplate = signatureTemplate.Replace("{{Username}}", GetUsername());
             signatureTemplate = signatureTemplate.Replace("{{Email}}", GetAddress());
             return signatureTemplate;

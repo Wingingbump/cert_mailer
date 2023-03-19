@@ -10,11 +10,11 @@ namespace cert_mailer
         [STAThread]
         static void Main()
         {
-            string rosterPath = @"C:\Users\Rocke\Documents\python\11023.0001 SBA ICG-EL Virtual - NN\Attendance Roster - 11023.0001.xlsx";
+/*            string rosterPath = @"F:\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\Attendance Roster - 11023.0001.xlsx";
             FileInfo rosterInfo = new FileInfo(rosterPath);
-            string gradesPath = @"C:\Users\Rocke\Documents\python\11023.0001 SBA ICG-EL Virtual - NN\BMRA Roster and Grades - 11023.0001.xlsx";
+            string gradesPath = @"F:\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\BMRA Roster and Grades - 11023.0001.xlsx";
             FileInfo gradesInfo = new FileInfo(gradesPath);
-            string certPath = @"C:\Users\Rocke\Documents\python\11023.0001 SBA ICG-EL Virtual - NN\EOC\Certs";
+            string certPath = @"F:\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\EOC\Certs";
 
             DataRead test = new DataRead(rosterInfo, gradesInfo, certPath);
             string courseName = test.course.CourseName;
@@ -22,9 +22,9 @@ namespace cert_mailer
             foreach (Student student in test.course.Students)
             {
                 EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
-                message.CreateDraft();
+                *//*message.CreateDraft();*//*
                 break;
-            }
+            }*/
 
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.

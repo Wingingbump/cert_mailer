@@ -35,7 +35,8 @@ namespace cert_mailer
             // Set CertPath
             this.certPath = certPath;
             // Set Course
-            this.course = courseReader(rosterSheet, gradesSheet);
+            string fileName = grades.Name;
+            this.course = courseReader(rosterSheet, gradesSheet, fileName);
             studentReader(rosterSheet, gradesSheet);
         }
 
@@ -66,13 +67,12 @@ namespace cert_mailer
                 if (rosterFirstName == gradesFirstName && rosterLastName == gradesLastName && rosterFirstName != null)
                 {
                     Student student = new Student(firstName, lastName, email, cert, grade);
-                    //Console.WriteLine(student.ToString());
                     course.AddStudent(student);
                 }
             }
         }
 
-        public Course courseReader(ExcelWorksheet rosterSheet, ExcelWorksheet gradesSheet)
+        public Course courseReader(ExcelWorksheet rosterSheet, ExcelWorksheet gradesSheet, string fileName)
         {
             var courseName = rosterSheet.Cells[5, 2].Value?.ToString();
             courseName = colonSplit(courseName ?? "");
@@ -85,6 +85,16 @@ namespace cert_mailer
             var endDateString = gradesSheet.Cells[2, 9].Value?.ToString();
             DateTime startDate = stringDateTime(startDateString ?? "");
             DateTime endDate = stringDateTime(endDateString ?? "");
+
+            // Get a possible courseId override
+            string courseId2 = fileName;
+            courseId2 = courseId2.Replace("BMRA Roster and Grades - ", "");
+            courseId2 = courseId2.Replace(".xlsx", "");
+
+            if(courseId != courseId2)
+            {
+                courseId = courseId2;
+            }
 
             return new Course(courseName ?? "", courseId ?? "", agency ?? "", instructor ?? "", location ?? "", startDate, endDate);
         }
