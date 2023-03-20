@@ -69,6 +69,7 @@
             // Roster
             // 
             Roster.AllowDrop = true;
+            Roster.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Roster.Location = new Point(12, 27);
             Roster.Name = "Roster";
             Roster.Size = new Size(255, 23);
@@ -78,6 +79,7 @@
             // 
             Grades.AcceptsTab = true;
             Grades.AllowDrop = true;
+            Grades.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Grades.Location = new Point(12, 71);
             Grades.Name = "Grades";
             Grades.Size = new Size(255, 23);
@@ -86,6 +88,7 @@
             // Certs
             // 
             Certs.AllowDrop = true;
+            Certs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Certs.Location = new Point(12, 115);
             Certs.Name = "Certs";
             Certs.Size = new Size(255, 23);
@@ -105,9 +108,10 @@
             // 
             // Browse1
             // 
-            Browse1.Location = new Point(273, 28);
+            Browse1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Browse1.Location = new Point(278, 27);
             Browse1.Name = "Browse1";
-            Browse1.Size = new Size(79, 22);
+            Browse1.Size = new Size(79, 23);
             Browse1.TabIndex = 7;
             Browse1.Text = "Browse";
             Browse1.UseVisualStyleBackColor = true;
@@ -115,9 +119,10 @@
             // 
             // Browse2
             // 
-            Browse2.Location = new Point(273, 70);
+            Browse2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Browse2.Location = new Point(278, 71);
             Browse2.Name = "Browse2";
-            Browse2.Size = new Size(79, 22);
+            Browse2.Size = new Size(79, 23);
             Browse2.TabIndex = 8;
             Browse2.Text = "Browse";
             Browse2.UseVisualStyleBackColor = true;
@@ -125,9 +130,10 @@
             // 
             // Browse3
             // 
-            Browse3.Location = new Point(273, 115);
+            Browse3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Browse3.Location = new Point(278, 115);
             Browse3.Name = "Browse3";
-            Browse3.Size = new Size(79, 22);
+            Browse3.Size = new Size(79, 23);
             Browse3.TabIndex = 9;
             Browse3.Text = "Browse";
             Browse3.UseVisualStyleBackColor = true;
@@ -135,9 +141,10 @@
             // 
             // Submit
             // 
-            Submit.Location = new Point(420, 236);
+            Submit.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            Submit.Location = new Point(278, 211);
             Submit.Name = "Submit";
-            Submit.Size = new Size(79, 22);
+            Submit.Size = new Size(79, 23);
             Submit.TabIndex = 10;
             Submit.Text = "Submit";
             Submit.UseVisualStyleBackColor = true;
@@ -150,7 +157,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(510, 271);
+            ClientSize = new Size(369, 245);
             Controls.Add(Submit);
             Controls.Add(Browse3);
             Controls.Add(Browse2);

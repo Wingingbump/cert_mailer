@@ -1,7 +1,6 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using System.Reflection;
 using Outlook = Microsoft.Office.Interop.Outlook;
-
-
 
 namespace cert_mailer
 {
@@ -12,7 +11,7 @@ namespace cert_mailer
         public string Body { get; set; }
         public string CertificatePath { get; set; }
 
-        public EmailBuilder(string recipient,  string courseName, string courseId, string certificatePath)
+        public EmailBuilder(string recipient, string courseName, string courseId, string certificatePath)
         {
             Recipient = recipient;
             Subject = SubjectBuilder(courseName, courseId);
@@ -30,6 +29,8 @@ namespace cert_mailer
             mail.HTMLBody = Body;
             mail.Attachments.Add(CertificatePath, OlAttachmentType.olByValue, Type.Missing, Type.Missing);
             mail.Save();
+            mail.SentOnBehalfOfName = "certs@bmra.com";
+
         }
 
         private string BodyBuilder(string course, string BMRARef)
@@ -84,21 +85,29 @@ namespace cert_mailer
 
         private string SignatureBuilder()
         {
-            string signatureTemplate = GetTemplateContent(@"C:\Users\Tommy\source\repos\Wingingbump\cert_mailer\template.htm");
-            signatureTemplate = signatureTemplate.Replace("{{Username}}", GetUsername());
+            string signatureTemplate = GetTemplateContent("cert_mailer.template.htm");
+            signatureTemplate = signatureTemplate.Replace("{{Username}}", "<b>" + GetUsername() + "</b>");
             signatureTemplate = signatureTemplate.Replace("{{Email}}", GetAddress());
             return signatureTemplate;
         }
 
-        private string GetTemplateContent(string templatePath)
+
+        private string GetTemplateContent(string resourceName)
         {
-            string content = "";
-            using (StreamReader reader = new StreamReader(templatePath))
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceStream = assembly.GetManifestResourceStream(resourceName);
+
+            if (resourceStream == null)
             {
-                content = reader.ReadToEnd();
+                throw new ArgumentException($"Resource {resourceName} not found in assembly.");
             }
-            return content;
+
+            using (var reader = new StreamReader(resourceStream))
+            {
+                return reader.ReadToEnd();
+            }
         }
+
 
         private Outlook.Application GetOutlookApplication()
         {

@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="template.htm" />
+  </ItemGroup>
+
+  <ItemGroup>
     <COMReference Include="Microsoft.Office.Interop.Outlook">
       <VersionMinor>6</VersionMinor>
       <VersionMajor>9</VersionMajor>
@@ -26,6 +30,10 @@
       <Isolated>false</Isolated>
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="template.htm" />
   </ItemGroup>
 
   <ItemGroup>

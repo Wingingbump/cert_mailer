@@ -3,9 +3,9 @@ namespace cert_mailer
     public partial class Form1 : Form
     {
 
-        private string rosterPath = "";
-        private string gradesPath = "";
-        private string certsPath = "";
+        private string? rosterPath = null;
+        private string? gradesPath = null;
+        private string? certPath = null;
 
         public Form1()
         {
@@ -14,7 +14,8 @@ namespace cert_mailer
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // What is this supposed to do?
+            this.MinimumSize = new Size(380, 300);
+            this.MaximumSize = new Size(800, 800);
         }
 
         private void Browse1_Click(object sender, EventArgs e)
@@ -64,16 +65,45 @@ namespace cert_mailer
                 // Update the "Cert" text box with the selected directory path
                 if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
                 {
-                    certsPath = dialog.SelectedPath;
+                    certPath = dialog.SelectedPath;
                     Certs.Text = Path.GetFileName(dialog.SelectedPath);
-                    Certs.Text = certsPath;
+                    Certs.Text = certPath;
                 }
             }
         }
 
         private void Submit_Click(object sender, EventArgs e)
         {
-            
+            if (rosterPath == null || certPath == null || gradesPath == null)
+            {
+                MessageBox.Show("Error Not all Fields filled", "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                try
+                {
+                    FileInfo rosterInfo = new FileInfo(rosterPath);
+                    FileInfo gradesInfo = new FileInfo(gradesPath);
+
+                    DataRead test = new DataRead(rosterInfo, gradesInfo, certPath);
+
+                    string courseName = test.course.CourseName;
+                    string courseId = test.course.CourseId;
+
+                    foreach (Student student in test.course.Students)
+                    {
+                        EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
+                        message.CreateDraft();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message, "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
+
     }
 }
