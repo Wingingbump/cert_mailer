@@ -6,37 +6,28 @@ namespace cert_mailer
     {
         const int GRADESPACE = 1;
         const int ROSTERSPACE = 11;
-        private ExcelWorksheet? rosterSheet;
-        private ExcelWorksheet? gradesSheet;
-        private String certPath;
+        private Dictionary<string, string> certMap = new Dictionary<string, string>();
+        private string certPath;
         public Course course { get; }
 
         public DataRead(FileInfo roster, FileInfo grades, String certPath)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             using var rosterExcel = new ExcelPackage(roster);
             // Get the Worksheet for the Roster
-            foreach (ExcelWorksheet sheet in rosterExcel.Workbook.Worksheets)
-            {
-                if ((sheet.Name).Contains("EOC"))
-                {
-                    rosterSheet = sheet;
-                    break;
-                }
-            }
+            using var rosterSheet = rosterExcel.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name.Contains("EOC"));
             if (rosterSheet == null)
             {
                 throw new Exception("The worksheet with name containing 'EOC' was not found.");
             }
             // Get the Worksheet for the Grades
-            using var GradesExcel = new ExcelPackage(grades);
-            gradesSheet = GradesExcel.Workbook.Worksheets[0];
+            using var gradesExcel = new ExcelPackage(grades);
+            using var gradesSheet = gradesExcel.Workbook.Worksheets[0];
             // Set CertPath
             this.certPath = certPath;
             // Set Course
             string fileName = grades.Name;
-            this.course = courseReader(rosterSheet, gradesSheet, fileName);
+            course = courseReader(rosterSheet, gradesSheet, fileName);
             studentReader(rosterSheet, gradesSheet);
         }
 
@@ -59,10 +50,10 @@ namespace cert_mailer
                 string firstName = rosterFirstName ?? "";
                 string lastName = rosterLastName ?? "";
                 string email = rosterEmail ?? "";
-                string grade = gradesGrade ?? "";
+                string grade = gradesGrade ?? "";//sdjfbsjdkbfsjkdbfjksdbfklajhsvbdlfukhvwljehvf
 
                 string fullName = $"{firstName} {lastName}";
-                string cert = matchCert(fullName);
+                string cert = MatchCert(fullName);
 
                 if (rosterFirstName == gradesFirstName && rosterLastName == gradesLastName && rosterFirstName != null)
                 {
@@ -91,7 +82,7 @@ namespace cert_mailer
             courseId2 = courseId2.Replace("BMRA Roster and Grades - ", "");
             courseId2 = courseId2.Replace(".xlsx", "");
 
-            if(courseId != courseId2)
+            if (courseId != courseId2)
             {
                 courseId = courseId2;
             }
@@ -113,31 +104,47 @@ namespace cert_mailer
             return b;
         }
 
-        private List<string> GetFileNames(string directoryPath)
+        private void BuildCertMap()
         {
-            List<string> fileNames = new List<string>();
-
-            foreach (string filePath in Directory.GetFiles(directoryPath))
-            {
-                fileNames.Add(Path.GetFileName(filePath));
-            }
-
-            return fileNames;
-        }
-
-        private string matchCert(string searchString)
-        {
+            // Get all the PDF files in the specified directory
             string[] files = Directory.GetFiles(certPath, "*.pdf");
 
+            // Loop through each file
             foreach (string file in files)
             {
-                if (Path.GetFileNameWithoutExtension(file).Contains(searchString))
+                // Get the file name without the extension and split it by the delimiter
+                string fileName = Path.GetFileNameWithoutExtension(file);
+                string[] nameParts = fileName.Split(" - ");
+
+                // Make sure the file name has at least two parts (full name and certificate type)
+                if (nameParts.Length >= 2)
                 {
-                    return file;
+                    // Get the full name from the file name and add it to the certMap if it's not already there
+                    string fullName = nameParts[1];
+                    if (!certMap.ContainsKey(fullName))
+                    {
+                        certMap.Add(fullName, file);
+                    }
                 }
             }
+        }
 
-            return "ERROR NOT FOUND";
+        private string MatchCert(string searchString)
+        {
+            if (certMap.Count == 0)
+            {
+                BuildCertMap();
+            }
+
+            try
+            {
+                return certMap[searchString];
+            }
+            catch (KeyNotFoundException)
+            {
+                Console.WriteLine("Could not find certificate for" + searchString);
+                return "Could not find certificate for" + searchString;
+            }
         }
 
     }

@@ -76,7 +76,7 @@ namespace cert_mailer
         {
             if (rosterPath == null || certPath == null || gradesPath == null)
             {
-                MessageBox.Show("Error Not all Fields filled", "Error",
+                MessageBox.Show("Error: Not all fields filled", "Error",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else

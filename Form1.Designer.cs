@@ -47,8 +47,10 @@
             RosterLabel.AutoSize = true;
             RosterLabel.BackColor = SystemColors.ControlLightLight;
             RosterLabel.Enabled = false;
+            RosterLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             RosterLabel.ForeColor = SystemColors.ActiveCaptionText;
             RosterLabel.Location = new Point(12, 9);
+            RosterLabel.Margin = new Padding(4, 0, 4, 0);
             RosterLabel.Name = "RosterLabel";
             RosterLabel.Size = new Size(76, 15);
             RosterLabel.TabIndex = 1;
@@ -59,8 +61,10 @@
             GradesLabel.AutoSize = true;
             GradesLabel.BackColor = SystemColors.ControlLightLight;
             GradesLabel.Enabled = false;
+            GradesLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             GradesLabel.ForeColor = SystemColors.ActiveCaptionText;
             GradesLabel.Location = new Point(12, 53);
+            GradesLabel.Margin = new Padding(4, 0, 4, 0);
             GradesLabel.Name = "GradesLabel";
             GradesLabel.Size = new Size(138, 15);
             GradesLabel.TabIndex = 2;
@@ -71,8 +75,9 @@
             Roster.AllowDrop = true;
             Roster.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Roster.Location = new Point(12, 27);
+            Roster.Margin = new Padding(4, 3, 4, 3);
             Roster.Name = "Roster";
-            Roster.Size = new Size(255, 23);
+            Roster.Size = new Size(254, 23);
             Roster.TabIndex = 3;
             // 
             // Grades
@@ -81,8 +86,9 @@
             Grades.AllowDrop = true;
             Grades.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Grades.Location = new Point(12, 71);
+            Grades.Margin = new Padding(4, 3, 4, 3);
             Grades.Name = "Grades";
-            Grades.Size = new Size(255, 23);
+            Grades.Size = new Size(254, 23);
             Grades.TabIndex = 4;
             // 
             // Certs
@@ -90,8 +96,9 @@
             Certs.AllowDrop = true;
             Certs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Certs.Location = new Point(12, 115);
+            Certs.Margin = new Padding(4, 3, 4, 3);
             Certs.Name = "Certs";
-            Certs.Size = new Size(255, 23);
+            Certs.Size = new Size(254, 23);
             Certs.TabIndex = 6;
             // 
             // CertsLabel
@@ -99,8 +106,10 @@
             CertsLabel.AutoSize = true;
             CertsLabel.BackColor = SystemColors.ControlLightLight;
             CertsLabel.Enabled = false;
+            CertsLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             CertsLabel.ForeColor = SystemColors.ActiveCaptionText;
             CertsLabel.Location = new Point(12, 97);
+            CertsLabel.Margin = new Padding(4, 0, 4, 0);
             CertsLabel.Name = "CertsLabel";
             CertsLabel.Size = new Size(112, 15);
             CertsLabel.TabIndex = 5;
@@ -109,7 +118,9 @@
             // Browse1
             // 
             Browse1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Browse1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Browse1.Location = new Point(278, 27);
+            Browse1.Margin = new Padding(4, 3, 4, 3);
             Browse1.Name = "Browse1";
             Browse1.Size = new Size(79, 23);
             Browse1.TabIndex = 7;
@@ -120,7 +131,9 @@
             // Browse2
             // 
             Browse2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Browse2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Browse2.Location = new Point(278, 71);
+            Browse2.Margin = new Padding(4, 3, 4, 3);
             Browse2.Name = "Browse2";
             Browse2.Size = new Size(79, 23);
             Browse2.TabIndex = 8;
@@ -131,7 +144,9 @@
             // Browse3
             // 
             Browse3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Browse3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Browse3.Location = new Point(278, 115);
+            Browse3.Margin = new Padding(4, 3, 4, 3);
             Browse3.Name = "Browse3";
             Browse3.Size = new Size(79, 23);
             Browse3.TabIndex = 9;
@@ -142,7 +157,9 @@
             // Submit
             // 
             Submit.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            Submit.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Submit.Location = new Point(278, 211);
+            Submit.Margin = new Padding(4, 3, 4, 3);
             Submit.Name = "Submit";
             Submit.Size = new Size(79, 23);
             Submit.TabIndex = 10;
@@ -168,8 +185,9 @@
             Controls.Add(Roster);
             Controls.Add(GradesLabel);
             Controls.Add(RosterLabel);
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(2);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "Form1";
             RightToLeftLayout = true;
             Text = "Certificate Mailer";
