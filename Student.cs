@@ -42,11 +42,6 @@
             return HashCode.Combine(FirstName, LastName, Email, Certification, Grade);
         }
 
-        public bool IsGradeDouble()
-        {
-            double result;
-            return double.TryParse(Grade, out result);
-        }
     }
 
 

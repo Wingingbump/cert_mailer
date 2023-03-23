@@ -1,4 +1,6 @@
-﻿using OfficeOpenXml;
+﻿using Microsoft.Graph;
+using OfficeOpenXml;
+using System.Diagnostics;
 
 namespace cert_mailer
 {
@@ -50,17 +52,31 @@ namespace cert_mailer
                 string firstName = rosterFirstName ?? "";
                 string lastName = rosterLastName ?? "";
                 string email = rosterEmail ?? "";
-                string grade = gradesGrade ?? "";//sdjfbsjdkbfsjkdbfjksdbfklajhsvbdlfukhvwljehvf
+                string grade = gradesGrade ?? "";
 
                 string fullName = $"{firstName} {lastName}";
                 string cert = MatchCert(fullName);
 
-                if (rosterFirstName == gradesFirstName && rosterLastName == gradesLastName && rosterFirstName != null)
+                if (rosterFirstName == gradesFirstName && rosterLastName == gradesLastName && rosterFirstName != null && GradeCheck(grade))
                 {
                     Student student = new Student(firstName, lastName, email, cert, grade);
                     course.AddStudent(student);
                 }
             }
+        }
+        private bool GradeCheck(string grade)
+        {
+            if (grade.ToLower() == "pass")
+            {
+                return true;
+            }
+            double result;
+            bool isDouble = double.TryParse(grade, out result);
+            if (isDouble && result >= 0.8)
+            {
+                return true;
+            }
+            return false;
         }
 
         public Course courseReader(ExcelWorksheet rosterSheet, ExcelWorksheet gradesSheet, string fileName)
@@ -107,7 +123,7 @@ namespace cert_mailer
         private void BuildCertMap()
         {
             // Get all the PDF files in the specified directory
-            string[] files = Directory.GetFiles(certPath, "*.pdf");
+            string[] files = System.IO.Directory.GetFiles(certPath, "*.pdf");
 
             // Loop through each file
             foreach (string file in files)
