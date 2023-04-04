@@ -1,13 +1,13 @@
 namespace cert_mailer
 {
-    public partial class Form1 : Form
+    public partial class CertMailerForm : Form
     {
 
         private string? rosterPath = null;
         private string? gradesPath = null;
         private string? certPath = null;
 
-        public Form1()
+        public CertMailerForm()
         {
             InitializeComponent();
         }

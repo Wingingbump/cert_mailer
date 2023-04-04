@@ -1,6 +1,6 @@
 ﻿namespace cert_mailer
 {
-    partial class Form1
+    partial class CertMailerForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CertMailerForm));
             RosterLabel = new Label();
             GradesLabel = new Label();
             Roster = new TextBox();
@@ -45,7 +45,7 @@
             // 
             RosterLabel.AccessibleName = "BMRA Roster";
             RosterLabel.AutoSize = true;
-            RosterLabel.BackColor = SystemColors.ControlLightLight;
+            RosterLabel.BackColor = SystemColors.Control;
             RosterLabel.Enabled = false;
             RosterLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             RosterLabel.ForeColor = SystemColors.ActiveCaptionText;
@@ -59,7 +59,7 @@
             // GradesLabel
             // 
             GradesLabel.AutoSize = true;
-            GradesLabel.BackColor = SystemColors.ControlLightLight;
+            GradesLabel.BackColor = SystemColors.Control;
             GradesLabel.Enabled = false;
             GradesLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             GradesLabel.ForeColor = SystemColors.ActiveCaptionText;
@@ -104,7 +104,7 @@
             // CertsLabel
             // 
             CertsLabel.AutoSize = true;
-            CertsLabel.BackColor = SystemColors.ControlLightLight;
+            CertsLabel.BackColor = SystemColors.Control;
             CertsLabel.Enabled = false;
             CertsLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             CertsLabel.ForeColor = SystemColors.ActiveCaptionText;
@@ -167,13 +167,13 @@
             Submit.UseVisualStyleBackColor = true;
             Submit.Click += Submit_Click;
             // 
-            // Form1
+            // CertMailerForm
             // 
             AccessibleName = "Window Name";
             AccessibleRole = AccessibleRole.TitleBar;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = SystemColors.ControlLightLight;
+            BackColor = SystemColors.Control;
             ClientSize = new Size(369, 245);
             Controls.Add(Submit);
             Controls.Add(Browse3);
@@ -187,8 +187,8 @@
             Controls.Add(RosterLabel);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(2, 2, 2, 2);
-            Name = "Form1";
+            Margin = new Padding(2);
+            Name = "CertMailerForm";
             RightToLeftLayout = true;
             Text = "Certificate Mailer";
             Load += Form1_Load;
