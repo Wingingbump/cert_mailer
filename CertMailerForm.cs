@@ -6,6 +6,7 @@ namespace cert_mailer
         private string? rosterPath = null;
         private string? gradesPath = null;
         private string? certPath = null;
+        private bool certEnabled = false;
 
         public CertMailerForm()
         {
@@ -85,13 +86,32 @@ namespace cert_mailer
                 {
                     FileInfo rosterInfo = new FileInfo(rosterPath);
                     FileInfo gradesInfo = new FileInfo(gradesPath);
+                    EnumCertificateType.CertificateType certificateType = EnumCertificateType.CertificateType.None;
+                    if (certEnabled)
+                    {
+                        string? certType = CertBox.SelectedItem.ToString();
+                        switch (certType)
+                        {
+                            case "Default Certificate":
+                                certificateType = EnumCertificateType.CertificateType.Default;
+                                break;
+                            case "SBA Certificate":
+                                certificateType = EnumCertificateType.CertificateType.SBA;
+                                break;
+                            case "NOAA Certificate":
+                                certificateType = EnumCertificateType.CertificateType.NOAA;
+                                break;
+                            case "DOIU Certificate":
+                                certificateType = EnumCertificateType.CertificateType.DOIU;
+                                break;
+                        }
+                    }
+                    DataRead reader = new DataRead(rosterInfo, gradesInfo, certPath, certEnabled, certificateType, (int)numericUpDown.Value);
 
-                    DataRead test = new DataRead(rosterInfo, gradesInfo, certPath);
+                    string courseName = reader.Course.CourseName;
+                    string courseId = reader.Course.CourseId;
 
-                    string courseName = test.course.CourseName;
-                    string courseId = test.course.CourseId;
-
-                    foreach (Student student in test.course.Students)
+                    foreach (Student student in reader.Course.Students)
                     {
                         EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
                         message.CreateDraft();
@@ -104,6 +124,19 @@ namespace cert_mailer
                 }
             }
         }
+
+        private void CerticateCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            certEnabled = !certEnabled;
+            // Hide or show the CertBox checkbox control based on the certEnabled variable
+            CertBox.Enabled = certEnabled;
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            // do nothing
+        }
+
 
     }
 }

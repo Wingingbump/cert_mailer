@@ -27,10 +27,15 @@ namespace cert_mailer
             mail.To = Recipient;
             mail.Subject = Subject;
             mail.HTMLBody = Body;
-            mail.Attachments.Add(CertificatePath, OlAttachmentType.olByValue, Type.Missing, Type.Missing);
+            mail.Attachments.Add(CertificatePath, OlAttachmentType.olByValue, Type.Missing, Type.Missing); // Will throw exception if file path is invalid
             mail.Save();
             mail.SentOnBehalfOfName = "certs@bmra.com";
 
+            // Check if draft has been created
+            if (mail.EntryID == null)
+            {
+                throw new System.Exception($"Failed to create draft for recipient: {Recipient}");
+            }
         }
 
         private string BodyBuilder(string course, string BMRARef)

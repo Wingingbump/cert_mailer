@@ -3,12 +3,13 @@
     public class Course
     {
         public string CourseName { get; set; }
+        public string CourseNamingScheme { get; set; }
         public string CourseId { get; set; }
-        private string AgencyName { get; set; }
-        private string Instructor { get; set; }
-        private string Location { get; set; }
-        private DateTime StartDate { get; set; }
-        private DateTime EndDate { get; set; }
+        public string AgencyName { get; set; }
+        public string Instructor { get; set; }
+        public string Location { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         public List<Student> Students { get; set; }
 
@@ -16,6 +17,7 @@
         public Course()
         {
             CourseName = "";
+            CourseNamingScheme = "";
             CourseId = "";
             AgencyName = "";
             Instructor = "";
@@ -25,9 +27,10 @@
             Students = new List<Student>();
         }
 
-        public Course(string courseName, string courseId, string agencyName, string instructor, string location, DateTime startDate, DateTime endDate)
+        public Course(string courseName, string courseNamingScheme, string courseId, string agencyName, string instructor, string location, DateTime startDate, DateTime endDate)
         {
             CourseName = courseName;
+            CourseNamingScheme = courseNamingScheme;
             CourseId = courseId;
             AgencyName = agencyName;
             Instructor = instructor;

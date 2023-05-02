@@ -2,10 +2,10 @@
 {
     public class Student
     {
-        private string FirstName { get; }
-        private string LastName { get; }
+        public string FirstName { get; }
+        public string LastName { get; }
         public string Email { get; }
-        public string Certification { get; }
+        public string Certification { get; set; }
         private string Grade { get; set; }
 
         public Student(string firstName, string lastName, string email, string certification, string grade)

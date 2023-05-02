@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CertMailerForm));
+            CertBox = new ComboBox();
             RosterLabel = new Label();
             GradesLabel = new Label();
             Roster = new TextBox();
@@ -39,16 +40,31 @@
             Browse2 = new Button();
             Browse3 = new Button();
             Submit = new Button();
+            CerticateCheckBox = new CheckBox();
+            numericUpDown = new NumericUpDown();
+            Minpasslabel = new Label();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown).BeginInit();
             SuspendLayout();
+            // 
+            // CertBox
+            // 
+            CertBox.Enabled = false;
+            CertBox.FormattingEnabled = true;
+            CertBox.Items.AddRange(new object[] { "Default Certificate", "SBA Certificate", "NOAA Certificate", "DOIU Certificate" });
+            CertBox.Location = new Point(11, 222);
+            CertBox.Name = "CertBox";
+            CertBox.Size = new Size(121, 23);
+            CertBox.TabIndex = 15;
+            CertBox.Tag = "";
+            CertBox.Text = "Select Certificate";
             // 
             // RosterLabel
             // 
             RosterLabel.AccessibleName = "BMRA Roster";
             RosterLabel.AutoSize = true;
             RosterLabel.BackColor = SystemColors.Control;
-            RosterLabel.Enabled = false;
             RosterLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            RosterLabel.ForeColor = SystemColors.ActiveCaptionText;
+            RosterLabel.ForeColor = Color.Black;
             RosterLabel.Location = new Point(12, 9);
             RosterLabel.Margin = new Padding(4, 0, 4, 0);
             RosterLabel.Name = "RosterLabel";
@@ -60,9 +76,8 @@
             // 
             GradesLabel.AutoSize = true;
             GradesLabel.BackColor = SystemColors.Control;
-            GradesLabel.Enabled = false;
             GradesLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            GradesLabel.ForeColor = SystemColors.ActiveCaptionText;
+            GradesLabel.ForeColor = Color.Black;
             GradesLabel.Location = new Point(12, 53);
             GradesLabel.Margin = new Padding(4, 0, 4, 0);
             GradesLabel.Name = "GradesLabel";
@@ -105,9 +120,8 @@
             // 
             CertsLabel.AutoSize = true;
             CertsLabel.BackColor = SystemColors.Control;
-            CertsLabel.Enabled = false;
             CertsLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            CertsLabel.ForeColor = SystemColors.ActiveCaptionText;
+            CertsLabel.ForeColor = Color.Black;
             CertsLabel.Location = new Point(12, 97);
             CertsLabel.Margin = new Padding(4, 0, 4, 0);
             CertsLabel.Name = "CertsLabel";
@@ -158,7 +172,7 @@
             // 
             Submit.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             Submit.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Submit.Location = new Point(278, 211);
+            Submit.Location = new Point(278, 224);
             Submit.Margin = new Padding(4, 3, 4, 3);
             Submit.Name = "Submit";
             Submit.Size = new Size(79, 23);
@@ -167,6 +181,40 @@
             Submit.UseVisualStyleBackColor = true;
             Submit.Click += Submit_Click;
             // 
+            // CerticateCheckBox
+            // 
+            CerticateCheckBox.AutoSize = true;
+            CerticateCheckBox.Location = new Point(12, 197);
+            CerticateCheckBox.Name = "CerticateCheckBox";
+            CerticateCheckBox.Size = new Size(122, 19);
+            CerticateCheckBox.TabIndex = 11;
+            CerticateCheckBox.Text = "Create Certificates";
+            CerticateCheckBox.UseVisualStyleBackColor = true;
+            CerticateCheckBox.CheckedChanged += CerticateCheckBox_CheckedChanged;
+            // 
+            // numericUpDown
+            // 
+            numericUpDown.Location = new Point(12, 159);
+            numericUpDown.Name = "numericUpDown";
+            numericUpDown.Size = new Size(120, 23);
+            numericUpDown.TabIndex = 12;
+            numericUpDown.ThousandsSeparator = true;
+            numericUpDown.Value = new decimal(new int[] { 80, 0, 0, 0 });
+            numericUpDown.ValueChanged += numericUpDown1_ValueChanged;
+            // 
+            // Minpasslabel
+            // 
+            Minpasslabel.AutoSize = true;
+            Minpasslabel.BackColor = SystemColors.Control;
+            Minpasslabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            Minpasslabel.ForeColor = Color.Black;
+            Minpasslabel.Location = new Point(12, 141);
+            Minpasslabel.Margin = new Padding(4, 0, 4, 0);
+            Minpasslabel.Name = "Minpasslabel";
+            Minpasslabel.Size = new Size(137, 15);
+            Minpasslabel.TabIndex = 13;
+            Minpasslabel.Text = "Minimum Passing Grade";
+            // 
             // CertMailerForm
             // 
             AccessibleName = "Window Name";
@@ -174,7 +222,11 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(369, 245);
+            ClientSize = new Size(369, 258);
+            Controls.Add(CertBox);
+            Controls.Add(Minpasslabel);
+            Controls.Add(numericUpDown);
+            Controls.Add(CerticateCheckBox);
             Controls.Add(Submit);
             Controls.Add(Browse3);
             Controls.Add(Browse2);
@@ -192,6 +244,7 @@
             RightToLeftLayout = true;
             Text = "Certificate Mailer";
             Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)numericUpDown).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -208,5 +261,9 @@
         private Button Browse2;
         private Button Browse3;
         private Button Submit;
+        private CheckBox CerticateCheckBox;
+        private NumericUpDown numericUpDown;
+        private Label Minpasslabel;
+        private ComboBox CertBox;
     }
 }
