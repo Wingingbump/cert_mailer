@@ -106,10 +106,11 @@ namespace cert_mailer
                 if (rosterType == 2)
                 {
                     int rosterSpacing = row + GRADESPACE; // Use GRADESPACE since it's only skipping the header
-                    var rosterPass = rosterSheet.Cells[rosterSpacing, 7].Value?.ToString();
-                    if (rosterPass == "N")
+                    var rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
+                    while (rosterPass == "N")
                     {
                         skip++;
+                        rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
                     }
                     rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 2].Value?.ToString();
                     rosterLastName = rosterSheet.Cells[rosterSpacing + skip, 1].Value?.ToString();
@@ -151,7 +152,7 @@ namespace cert_mailer
             }
             double result;
             bool isDouble = double.TryParse(grade, out result);
-            if (isDouble && result >= minimumPassingGrade)
+            if (isDouble && result >= (double)minimumPassingGrade/100)
             {
                 return true;
             }
@@ -169,9 +170,10 @@ namespace cert_mailer
             }
             if (rosterType == 2)
             {
-                MissingInfoForm missingInfoForm = new MissingInfoForm();
-                missingInfoForm.ShowDialog();
-                instructor = missingInfoForm.MissingData;
+                // MissingInfoForm missingInfoForm = new MissingInfoForm();
+                // missingInfoForm.ShowDialog();
+                //instructor = missingInfoForm.MissingData;
+                instructor = ""; // Instructor doesn't really play a role rn so we can just skip this for simplicity
             }
 
             var courseName = gradesSheet.Cells[2, 7].Value?.ToString();

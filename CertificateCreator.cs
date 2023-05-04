@@ -20,7 +20,6 @@ namespace cert_mailer
             this.course = course;
             this.certPath = certPath;
             certificateName = course.CourseNamingScheme;
-            Console.WriteLine(certificateName);
 
             // Get the Grades sheet
             this.gradeSheet = gradeSheet;
@@ -195,7 +194,6 @@ namespace cert_mailer
 
             // Close the merged PDF document
             mergedPdf.Close(); 
-            Console.WriteLine($"Merged file saved to {filePath}");
         }
 
         public string GetCertType(EnumCertificateType.CertificateType enumCertType)
