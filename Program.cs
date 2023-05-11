@@ -23,22 +23,22 @@ namespace cert_mailer
                         //string certPath = @"F:\tests\96523.0024 VAAA PM FPM 334-VA Virtual - JB\96523.0024 VAAA PM FPM 334-VA Virtual - JB\EOC\Certs";
                         //string certPath = @"F:\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\EOC\Certs";
                         string certPath = @"F:\tests\";
-                        var certType = EnumCertificateType.CertificateType.Default;
+                        var certType = EnumCertificateType.CertificateType.NOAA;
                         DataRead test = new DataRead(rosterInfo, gradesInfo, certPath, true, certType, 80);
 
 
                         string courseName = test.Course.CourseName;
                         string courseId = test.Course.CourseId;
-
+            *//*
                         foreach (Student student in test.Course.Students)
                         {
                             EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
                             message.CreateDraft();
-                        }
-
+                        }*/
+            /*
                         Console.WriteLine("Elapsed Time is {0} ms", stopwatch.ElapsedMilliseconds);
-                        stopwatch.Stop();
-            */
+                        stopwatch.Stop();*/
+
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();

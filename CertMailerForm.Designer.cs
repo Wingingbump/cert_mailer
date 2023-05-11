@@ -43,6 +43,7 @@
             CerticateCheckBox = new CheckBox();
             numericUpDown = new NumericUpDown();
             Minpasslabel = new Label();
+            progressBar1 = new ProgressBar();
             ((System.ComponentModel.ISupportInitialize)numericUpDown).BeginInit();
             SuspendLayout();
             // 
@@ -172,7 +173,7 @@
             // 
             Submit.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             Submit.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            Submit.Location = new Point(278, 224);
+            Submit.Location = new Point(278, 221);
             Submit.Margin = new Padding(4, 3, 4, 3);
             Submit.Name = "Submit";
             Submit.Size = new Size(79, 23);
@@ -215,6 +216,14 @@
             Minpasslabel.TabIndex = 13;
             Minpasslabel.Text = "Minimum Passing Grade";
             // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(156, 228);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(107, 10);
+            progressBar1.TabIndex = 16;
+            progressBar1.Visible = false;
+            // 
             // CertMailerForm
             // 
             AccessibleName = "Window Name";
@@ -223,6 +232,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(369, 258);
+            Controls.Add(progressBar1);
             Controls.Add(CertBox);
             Controls.Add(Minpasslabel);
             Controls.Add(numericUpDown);
@@ -265,5 +275,6 @@
         private NumericUpDown numericUpDown;
         private Label Minpasslabel;
         private ComboBox CertBox;
+        public ProgressBar progressBar1;
     }
 }

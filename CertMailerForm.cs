@@ -87,6 +87,8 @@ namespace cert_mailer
                     FileInfo rosterInfo = new FileInfo(rosterPath);
                     FileInfo gradesInfo = new FileInfo(gradesPath);
                     EnumCertificateType.CertificateType certificateType = EnumCertificateType.CertificateType.None;
+                    progressBar1.Visible = true;
+                    progressBar1.Value = 5;
                     if (certEnabled)
                     {
                         string? certType = CertBox.SelectedItem.ToString();
@@ -107,7 +109,7 @@ namespace cert_mailer
                         }
                     }
                     DataRead reader = new DataRead(rosterInfo, gradesInfo, certPath, certEnabled, certificateType, (int)numericUpDown.Value);
-
+                    progressBar1.Value = 10;
                     string courseName = reader.Course.CourseName;
                     string courseId = reader.Course.CourseId;
 
@@ -115,7 +117,9 @@ namespace cert_mailer
                     {
                         EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
                         message.CreateDraft();
+                        progressBar1.Value += 2;
                     }
+                    progressBar1.Value = 100;
                 }
                 catch (Exception ex)
                 {
