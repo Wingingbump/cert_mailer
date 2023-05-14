@@ -41,8 +41,12 @@ namespace cert_mailer
             var location = course.Location;
             var clp = gradesSheet.Cells[2, 12].Value;
 
-            // Plus one to include the 0th student
-            var rowCount = course.Students.Count + 1;
+            // For all rows with data
+            var rowCount = gradesSheet.Cells
+            .Select(cell => cell.Start.Row)
+            .Distinct()
+            .Count(row => gradesSheet.Cells[row, 1].Value != null);
+
             // create doc cert for each student
             Parallel.For(1, rowCount, (row) =>
             {
