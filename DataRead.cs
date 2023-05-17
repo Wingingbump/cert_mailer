@@ -42,7 +42,13 @@ namespace cert_mailer
             // If it's not BMRA it's gotta be the VA! idk...
             else
             {
-                rosterSheet = rosterExcel.Workbook.Worksheets.LastOrDefault();
+                foreach (ExcelWorksheet worksheet in rosterExcel.Workbook.Worksheets)
+                {
+                    if (worksheet.Hidden == eWorkSheetHidden.Visible)
+                    {
+                        rosterSheet = worksheet;
+                    }
+                }
                 rosterType = 2;
             }
 
@@ -163,10 +169,11 @@ namespace cert_mailer
         {
             // Varibles for data gathered from the course sheet
             var instructor = "";
-            if (rosterType == 1)
+/*            if (rosterType == 1)
             {
-                instructor = rosterSheet.Cells[7, 10].Value?.ToString();
-                instructor = ColonSplit(instructor ?? "");
+                *//*instructor = rosterSheet.Cells[7, 10].Value?.ToString();
+                instructor = ColonSplit(instructor ?? "");*//*
+                instructor = "";
             }
             if (rosterType == 2)
             {
@@ -174,7 +181,7 @@ namespace cert_mailer
                 // missingInfoForm.ShowDialog();
                 //instructor = missingInfoForm.MissingData;
                 instructor = ""; // Instructor doesn't really play a role rn so we can just skip this for simplicity
-            }
+            }*/
 
             var courseName = gradesSheet.Cells[2, 7].Value?.ToString();
             var courseId = gradesSheet.Cells[2, 1].Value?.ToString();
