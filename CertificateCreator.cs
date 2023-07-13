@@ -83,7 +83,7 @@ namespace cert_mailer
                             { "COURSE", courseName },
                             { "CLPS", clp.ToString() ?? "null clp"},
                             { "LOCATION", location },
-                            { "START_DATE", startDate.ToString("MM/dd/yyyy") },
+                            { "START_DATE", startDate.ToString("M/d/yyyy") },
                             { "END_DATE", "" }
                         };
                     }
@@ -96,8 +96,8 @@ namespace cert_mailer
                             { "COURSE", courseName },
                             { "CLPS", clp.ToString() ?? "null clp"},
                             { "LOCATION", location },
-                            { "START_DATE", startDate.ToString("MM/dd/yyyy") },
-                            { "END_DATE", " - " + endDate.ToString("MM/dd/yyyy") }
+                            { "START_DATE", startDate.ToString("M/d/yyyy") },
+                            { "END_DATE", " - " + endDate.ToString("M/d/yyyy") }
                         };
                     }
 

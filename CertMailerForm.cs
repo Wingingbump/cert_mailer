@@ -115,9 +115,12 @@ namespace cert_mailer
 
                     foreach (Student student in reader.Course.Students)
                     {
-                        EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
-                        message.CreateDraft();
-                        progressBar1.Value += 2;
+                        if (student.Pass == true)
+                        {
+                            EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
+                            message.CreateDraft();
+                            progressBar1.Value += 2;
+                        }
                     }
                     progressBar1.Value = 100;
                 }

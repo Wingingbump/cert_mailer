@@ -6,20 +6,20 @@
         public string LastName { get; }
         public string Email { get; }
         public string Certification { get; set; }
-        private string Grade { get; set; }
+        public bool Pass { get; set; }
 
-        public Student(string firstName, string lastName, string email, string certification, string grade)
+        public Student(string firstName, string lastName, string email, string certification, bool pass)
         {
             FirstName = firstName;
             LastName = lastName;
             Email = email;
             Certification = certification;
-            Grade = grade;
+            Pass = pass;
         }
 
         public override string ToString()
         {
-            return $"{FirstName} {LastName} ({Email}): {Certification} - {Grade}";
+            return $"{FirstName} {LastName} ({Email}): {Certification} - {Pass}";
         }
 
         public override bool Equals(object? obj)
@@ -34,12 +34,12 @@
                 && LastName == other.LastName
                 && Email == other.Email
                 && Certification == other.Certification
-                && Grade == other.Grade;
+                && Pass == other.Pass;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(FirstName, LastName, Email, Certification, Grade);
+            return HashCode.Combine(FirstName, LastName, Email, Certification, Pass);
         }
 
     }
