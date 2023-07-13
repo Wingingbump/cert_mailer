@@ -1,10 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OfficeOpenXml;
 
 namespace cert_mailer;
-internal class Class1
+internal class Evaluations
 {
+    private string path
+    {
+        get; set;
+    }
+    public Evaluations(FileInfo evaluation, string EOCpath, string type)
+    {
+        // Load the evaluation file and get the first worksheet.
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        using var evaluationExcel = new ExcelPackage(evaluation);
+        var evalSheet = evaluationExcel.Workbook.Worksheets.FirstOrDefault();
+
+        path = EOCpath;
+    }
 }
