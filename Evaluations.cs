@@ -53,8 +53,12 @@ public class Evaluations
     {
         get; set;
     }
+    private string attendance
+    {
+        get; set;
+    }
 
-    public Evaluations(FileInfo evaluation, string EOCpath, string type, string courseCode, DateTime startDate, DateTime endDate, string instructor, string agency, string courseName)
+    public Evaluations(FileInfo evaluation, string EOCpath, string type, string courseCode, DateTime startDate, DateTime endDate, string instructor, string agency, string courseName, string attendance)
     {
         // Load the evaluation file and get the first worksheet.
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -68,6 +72,7 @@ public class Evaluations
         this.instructor = instructor;
         this.agency = agency;
         this.courseName = courseName;
+        this.attendance = attendance;
         // If the worksheet exists, read the evaluations.
         if (evalSheet != null)
         {
@@ -284,6 +289,7 @@ public class Evaluations
         }
 
         // Fill out the response amount
+        outputSheet.Cells[21, 13].Value = attendance;
         outputSheet.Cells[22, 13].Value = scores["Question1"].Sum();
         outputSheet.Cells[23, 13].Value = comments.Count;
 
