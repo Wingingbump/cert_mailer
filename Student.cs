@@ -7,14 +7,17 @@
         public string Email { get; }
         public string Certification { get; set; }
         public bool Pass { get; set; }
+        public string Grade
+        { get; set; }
 
-        public Student(string firstName, string lastName, string email, string certification, bool pass)
+        public Student(string firstName, string lastName, string email, string certification, bool pass, string grade)
         {
             FirstName = firstName;
             LastName = lastName;
             Email = email;
             Certification = certification;
             Pass = pass;
+            Grade = grade;
         }
 
         public override string ToString()

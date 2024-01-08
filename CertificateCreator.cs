@@ -203,24 +203,24 @@ namespace cert_mailer
         public string GetCertType(EnumCertificateType.CertificateType enumCertType)
         {
             string fileName;
-            string filePath;
+            string filePath = Application.StartupPath + "\\Assets";
             switch (enumCertType)
             {
                 case EnumCertificateType.CertificateType.Default:
                     fileName = "Certificate of Training - Edit.docx";
-                    filePath = Path.Combine(Application.StartupPath, fileName);
+                    filePath = Path.Combine(filePath, fileName);
                     return filePath;
                 case EnumCertificateType.CertificateType.SBA:
                     fileName = "Certificate of Training - SBA Edit.docx";
-                    filePath = Path.Combine(Application.StartupPath, fileName);
+                    filePath = Path.Combine(filePath, fileName);
                     return filePath;
                 case EnumCertificateType.CertificateType.NOAA:
                     fileName = "Certificate of Training - NOAA Edit.docx";
-                    filePath = Path.Combine(Application.StartupPath, fileName);
+                    filePath = Path.Combine(filePath, fileName);
                     return filePath;
                 case EnumCertificateType.CertificateType.DOIU:
                     fileName = "Certificate of Training - DOIU Edit.docx";
-                    filePath = Path.Combine(Application.StartupPath, fileName);
+                    filePath = Path.Combine(filePath, fileName);
                     return filePath;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(enumCertType), enumCertType, null);

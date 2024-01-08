@@ -117,7 +117,7 @@ namespace cert_mailer
                     {
                         if (student.Pass == true)
                         {
-                            EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification);
+                            EmailBuilder message = new EmailBuilder(student.Email, courseName, courseId, student.Certification, student.Grade);
                             message.CreateDraft();
                             progressBar1.Value += 2;
                         }

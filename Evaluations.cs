@@ -57,8 +57,12 @@ public class Evaluations
     {
         get; set;
     }
+    private string courseABV
+    {
+        get; set;
+    }
 
-    public Evaluations(FileInfo evaluation, string EOCpath, string type, string courseCode, DateTime startDate, DateTime endDate, string instructor, string agency, string courseName, string attendance)
+    public Evaluations(FileInfo evaluation, string EOCpath, string type, string courseCode, DateTime startDate, DateTime endDate, string instructor, string agency, string courseName, string attendance, string courseABV)
     {
         // Load the evaluation file and get the first worksheet.
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -73,6 +77,7 @@ public class Evaluations
         this.agency = agency;
         this.courseName = courseName;
         this.attendance = attendance;
+        this.courseABV = courseABV;
         // If the worksheet exists, read the evaluations.
         if (evalSheet != null)
         {
@@ -88,19 +93,36 @@ public class Evaluations
         Dictionary<string, string[]> comments = new Dictionary<string, string[]>();
 
         // Initialize rating counts for each question
-        questionRatingCounts.Add("Question1", new int[2]); // Index 0 for "No", Index 1 for "Yes"
-        questionRatingCounts.Add("Question2", new int[2]); // Index 0 for "No", Index 1 for "Yes"
-        questionRatingCounts.Add("Question3", new int[5]); // Index 0 for "Poor", Index 4 for "Excellent"
-        questionRatingCounts.Add("Question4", new int[5]);
-        questionRatingCounts.Add("Question5", new int[5]);
-        questionRatingCounts.Add("Question7", new int[2]); // Index 0 for "Not Recommend", Index 1 for "Recommend"
-        questionRatingCounts.Add("Question8", new int[5]);
-        questionRatingCounts.Add("Question9", new int[5]);
-        questionRatingCounts.Add("Question10", new int[5]);
-        questionRatingCounts.Add("Question11", new int[5]);
-        questionRatingCounts.Add("Question14", new int[5]);
-        questionRatingCounts.Add("Question15", new int[5]);
-        questionRatingCounts.Add("Question16", new int[5]);
+        if (type.Equals("DISA")) {
+            questionRatingCounts.Add("Question1", new int[2]); // Index 0 for "No", Index 1 for "Yes"
+            questionRatingCounts.Add("Question2", new int[2]); // Index 0 for "No", Index 1 for "Yes"
+            questionRatingCounts.Add("Question3", new int[10]); // Index 0 for "Poor", Index 4 for "Excellent"
+            questionRatingCounts.Add("Question4", new int[10]);
+            questionRatingCounts.Add("Question5", new int[10]);
+            questionRatingCounts.Add("Question7", new int[2]); // Index 0 for "Not Recommend", Index 1 for "Recommend"
+            questionRatingCounts.Add("Question8", new int[10]);
+            questionRatingCounts.Add("Question9", new int[10]);
+            questionRatingCounts.Add("Question10", new int[10]);
+            questionRatingCounts.Add("Question11", new int[10]);
+            questionRatingCounts.Add("Question14", new int[10]);
+            questionRatingCounts.Add("Question15", new int[10]);
+            questionRatingCounts.Add("Question16", new int[10]);
+        }
+        else {
+            questionRatingCounts.Add("Question1", new int[2]); // Index 0 for "No", Index 1 for "Yes"
+            questionRatingCounts.Add("Question2", new int[2]); // Index 0 for "No", Index 1 for "Yes"
+            questionRatingCounts.Add("Question3", new int[5]); // Index 0 for "Poor", Index 4 for "Excellent"
+            questionRatingCounts.Add("Question4", new int[5]);
+            questionRatingCounts.Add("Question5", new int[5]);
+            questionRatingCounts.Add("Question7", new int[2]); // Index 0 for "Not Recommend", Index 1 for "Recommend"
+            questionRatingCounts.Add("Question8", new int[5]);
+            questionRatingCounts.Add("Question9", new int[5]);
+            questionRatingCounts.Add("Question10", new int[5]);
+            questionRatingCounts.Add("Question11", new int[5]);
+            questionRatingCounts.Add("Question14", new int[5]);
+            questionRatingCounts.Add("Question15", new int[5]);
+            questionRatingCounts.Add("Question16", new int[5]);
+        }
 
         // Initialize comment count
         int commentCount = 1;
@@ -111,6 +133,11 @@ public class Evaluations
         {
             buffer = 4;
             buffer2 = 6;
+        }
+        if (type.Equals("DISA"))
+        {
+            buffer = 5;
+            buffer2 = 5;
         }
 
         for (var row = 2; row <= rowCount; row++)
@@ -195,61 +222,27 @@ public class Evaluations
             }
 
         }
-
-        // Display the counts for each question
-        foreach (var kvp in questionRatingCounts)
-        {
-            string question = kvp.Key;
-            int[] ratingCounts = kvp.Value;
-
-            // For Yes/No questions, display the counts for "Yes" and "No"
-            if (question == "Question1" || question == "Question2")
-            {
-                int yesCount = ratingCounts[1]; // Index 1 for "Yes"
-                int noCount = ratingCounts[0]; // Index 0 for "No"
-                Console.WriteLine($"Question {question}: Yes: {yesCount} occurrences");
-                Console.WriteLine($"Question {question}: No: {noCount} occurrences");
-            }
-            // For Question 7, display the counts for "Recommend" and "Not Recommend"
-            else if (question == "Question7")
-            {
-                int recommendCount = ratingCounts[1]; // Index 1 for "Recommend"
-                int notRecommendCount = ratingCounts[0]; // Index 0 for "Not Recommend"
-                Console.WriteLine($"Question {question}: Recommend: {recommendCount} occurrences");
-                Console.WriteLine($"Question {question}: Not Recommend: {notRecommendCount} occurrences");
-            }
-            else
-            {
-                // For other questions, display the counts for ratings
-                for (int i = ratingCounts.Length - 1; i >= 0; i--)
-                {
-                    int rating = i + 1;
-                    int count = ratingCounts[i];
-                    Console.WriteLine($"Question {question}: Rating {rating}: {count} occurrences");
-                }
-            }
-        }
-        foreach (var comment in comments)
-        {
-            Console.WriteLine($"Comment: {comment.Key}");
-            Console.WriteLine($"Content: {string.Join(", ", comment.Value)}");
-            Console.WriteLine(); // Add an empty line between comments
-        }
         CreateEvaluationTemplate(questionRatingCounts, comments);
     }
 
     // Create Excel file
     public void CreateEvaluationTemplate(Dictionary<string, int[]> scores, Dictionary<string, string[]> comments)
     {
+        var DISABuffer = 12;
         // Combine path with file name
         string output = System.IO.Path.Combine(path, "Course Evaluation Summary - " + courseCode + ".xlsx");
-        // Get template file path   
-        string templatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, "Course Evaluation Summary - Template.xlsx");
+        // Get template file path
+        string templatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath + "\\Assets", "Course Evaluation Summary - Template.xlsx");
+        if (type.Equals("DISA")) {
+            templatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath + "\\Assets", "Course Evaluation Summary - DISA Template.xlsx");
+            DISABuffer = 17;
+        }
         // Copy the template file to the output path
         System.IO.File.Copy(templatePath, output, true);
         // Open the copied file for editing
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var outputPath = new ExcelPackage(new FileInfo(output));
+
         // Get the first sheet
         ExcelWorksheet outputSheet = outputPath.Workbook.Worksheets.FirstOrDefault();
         int[] questionOrder = new int[] { 11, 8, 10, 9, 3, 14, 15, 16, 4, 5 };
@@ -261,15 +254,26 @@ public class Evaluations
                 skip++;
                 items++;
             }
-            for (int col = 8; col <= 12; col++)
+            for (int col = 8; col <= DISABuffer; col++)
             {
-                int reversedIndex = 12 - col; // Calculate the reversed index
-                outputSheet.Cells[items, col].Value = scores["Question" + questionOrder[items - 6 - skip]][reversedIndex];
+                int reversedIndex = DISABuffer - col; // Calculate the reversed index
+                if (scores["Question" + questionOrder[items - 6 - skip]][reversedIndex] == 0)
+                {
+                    outputSheet.Cells[items, col].Value = "";
+                }
+                else
+                {
+                    outputSheet.Cells[items, col].Value = scores["Question" + questionOrder[items - 6 - skip]][reversedIndex];
+                }
             }
         }
 
         // Yes/No questions
         int[] yesNo = new int[] { 9, 11 };
+        if (type.Equals("DISA"))
+        {
+            yesNo = new int[] { 12, 14 };
+        }
         int[] yesNoQuestions = new int[] { 2, 3, 19 };
 
         for (int rowIndex = 0; rowIndex < yesNoQuestions.Length; rowIndex++)
@@ -279,34 +283,72 @@ public class Evaluations
                 int reversedColIndex = yesNo.Length - 1 - colIndex; // Calculate the reversed column index
                 if (rowIndex < 2)
                 {
-                    outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = scores["Question" + (rowIndex + 1)][reversedColIndex];
+                    if (scores["Question" + (rowIndex + 1)][reversedColIndex] == 0)
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = "";
+                    }
+                    else
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = scores["Question" + (rowIndex + 1)][reversedColIndex];
+                    }
                 }
                 else
                 {
-                    outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = scores["Question" + (7)][reversedColIndex];
+                    if (scores["Question" + (7)][reversedColIndex] == 0) {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = "";
+                    }
+                    else
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = scores["Question" + (7)][reversedColIndex];
+                    }
                 }
             }
         }
 
         // Fill out the response amount
-        outputSheet.Cells[21, 13].Value = attendance;
-        outputSheet.Cells[22, 13].Value = scores["Question1"].Sum();
-        outputSheet.Cells[23, 13].Value = comments.Count;
-
-        // Header for Evaluation Summary
-        string dateRange;
-        if (startDate == endDate)
+        if (type.Equals("DISA"))
         {
-            dateRange = startDate.ToString("MMM. d, yyyy");
+            outputSheet.Cells[21, 17].Value = attendance;
+            outputSheet.Cells[22, 17].Value = scores["Question1"].Sum();
+            outputSheet.Cells[23, 17].Value = comments.Count;
         }
         else
         {
+            outputSheet.Cells[21, 13].Value = attendance;
+            outputSheet.Cells[22, 13].Value = scores["Question1"].Sum();
+            outputSheet.Cells[23, 13].Value = comments.Count;
+        }
+
+        // Header for Evaluation Summary
+        string dateRange;
+        if (startDate.Date == endDate.Date)
+        {
+            // Same day
+            dateRange = startDate.ToString("MMM. d, yyyy");
+        }
+        else if (startDate.Month == endDate.Month && startDate.Year == endDate.Year)
+        {
+            // Same month and year
             dateRange = startDate.ToString("MMM. d") + " - " + endDate.ToString("d, yyyy");
         }
+        else if (startDate.Year == endDate.Year)
+        {
+            // Different months, same year
+            dateRange = startDate.ToString("MMM. d") + " - " + endDate.ToString("MMM. d, yyyy");
+        }
+        else
+        {
+            // Different months and years
+            dateRange = startDate.ToString("MMM. d, yyyy") + " - " + endDate.ToString("MMM. d, yyyy");
+        }
+
+        // Replace "Sep." with "Sept."
+        dateRange = dateRange.Replace("Sep.", "Sept.");
+
         outputSheet.HeaderFooter.OddHeader.RightAlignedText = $"BMRA Ref: {courseCode} \r\n DATE: {dateRange}";
 
         // Footer for Evaluation Summary
-        outputSheet.HeaderFooter.OddFooter.LeftAlignedText = $"Name of course: {courseName}";
+        outputSheet.HeaderFooter.OddFooter.LeftAlignedText = $"Name of course: {courseABV}";
         outputSheet.HeaderFooter.OddFooter.CenteredText = $"{agency} - Virtual";
         outputSheet.HeaderFooter.OddFooter.RightAlignedText = $"Instructor: {instructor}";
 
@@ -315,7 +357,7 @@ public class Evaluations
         outputPath.Save();
 
         // Open Comment template
-        string commentTemplatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, "Student Comments - Template.docx");
+        string commentTemplatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath + "\\Assets", "Student Comments - Template.docx");
         // Get output path for comment
         string commentOutput = System.IO.Path.Combine(path, "Student Comments - " + courseCode + ".docx");
         // Copy the template file to the output path
@@ -446,7 +488,7 @@ public class Evaluations
 
     private void UpdateRatingCount(int[] ratingCounts, int rating)
     {
-        if (rating >= 1 && rating <= 5)
+        if (rating >= 1 && rating <= 10)
         {
             ratingCounts[rating - 1]++;
         }
@@ -518,9 +560,16 @@ public class Evaluations
         {
             return ratingMap[rating.ToLower()];
         }
-        // Default to 0 if the rating is not found.
+
+        if (int.TryParse(rating, out int result))
+        {
+            return result;
+        }
+
+        // Default to 0 if the rating is not an integer or not found in the map
         return 0;
     }
+
 
     // Remove any non-digit characters from the input
     private int ExtractRatingFromFormat(string input)

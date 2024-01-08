@@ -18,6 +18,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CertMailerForm.cs" />
+    <Compile Remove="CertMailerForm.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="CertMailerForm.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Certificate of Training - DOIU Edit.docx" />
     <None Remove="Certificate of Training - Edit.docx" />
     <None Remove="Certificate of Training - NOAA Edit.docx" />

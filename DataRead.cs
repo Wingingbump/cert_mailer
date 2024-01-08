@@ -8,8 +8,9 @@ public class DataRead
     private readonly Dictionary<int, string> rosterType = new()
     {
         {1, "BMRA"},
-        {2, "VA"},
-        {3, "OTHER"}
+        {2, "VA PM"},
+        {3, "DISA"},
+        {4, "VA CPS"}
     };
     public const int GRADESPACE = 1;
     const int BMRAROSTERSPACE = 11;
@@ -23,24 +24,23 @@ public class DataRead
         // Set CertPath
         this.certPath = certPath;
 
-        var rosterType = 1;
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var rosterExcel = new ExcelPackage(roster);
         // Get the Worksheet for the Roster
         // If it's a BMRA roster
         ExcelWorksheet? rosterSheet = null;
-        if (IsBMRARoster(rosterExcel))
+        var rosterType = IsBMRARoster(rosterExcel);
+        if (rosterType == 1 || rosterType == 3 || rosterType == 4)
         {
             rosterSheet = rosterExcel.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name.Contains("EOC"));
-            rosterType = 1;
             // Ensure that there's an EOC page
             if (rosterSheet == null)
             {
                 throw new Exception("The worksheet with name containing 'EOC' was not found.");
             }
         }
-        // If it's not BMRA it's gotta be the VA! idk...
-        else
+        // VA
+        else if (rosterType == 2)
         {
             foreach (ExcelWorksheet worksheet in rosterExcel.Workbook.Worksheets)
             {
@@ -49,7 +49,10 @@ public class DataRead
                     rosterSheet = worksheet;
                 }
             }
-            rosterType = 2;
+        }
+        else
+        {
+            throw new Exception("Roster Type Unsupported");
         }
 
         if (rosterSheet == null)
@@ -66,7 +69,7 @@ public class DataRead
 
         // Set and create Course
         var fileName = grades.Name;
-        Course = CourseReader(rosterSheet, gradesSheet, fileName, rosterType);
+        Course = CourseReader(gradesSheet, fileName);
 
         // Add students to course
         StudentReader(rosterSheet, gradesSheet, rosterType, createCerts);
@@ -96,6 +99,21 @@ public class DataRead
         var rowCount = Math.Max(rosterSheet.Dimension.End.Row, gradesSheet.Dimension.End.Row);
         for (var row = 1; row <= rowCount; row++)
         {
+            // Scan grade sheet
+            var gradeSpacing = row + GRADESPACE;
+            var gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
+            if (certPath.Equals("SD") && gradesGrade != null) {
+                gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
+            }
+            else if (gradesGrade != null && !GradeCheck(gradesGrade))
+            {
+                gradeSkip++;
+                gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
+            }
+
+            var gradesFirstName = gradesSheet.Cells[gradeSpacing + gradeSkip, 3].Value?.ToString();
+            var gradesLastName = gradesSheet.Cells[gradeSpacing + gradeSkip, 5].Value?.ToString();
+
             // Declare roster varibles
             var rosterFirstName = "";
             var rosterLastName = "";
@@ -110,7 +128,7 @@ public class DataRead
                 rosterEmail = rosterSheet.Cells[rosterSpacing, 4].Value?.ToString();
             }
             // VA roster
-            if (rosterType == 2)
+            else if (rosterType == 2)
             {
                 var rosterSpacing = row + GRADESPACE; // Use GRADESPACE since it's only skipping the header
                 var rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
@@ -123,17 +141,26 @@ public class DataRead
                 rosterLastName = rosterSheet.Cells[rosterSpacing + skip, 1].Value?.ToString();
                 rosterEmail = rosterSheet.Cells[rosterSpacing + skip, 3].Value?.ToString();
             }
-
-            var gradeSpacing = row + GRADESPACE;
-            var gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
-            if (gradesGrade != null && !GradeCheck(gradesGrade))
+            else if (rosterType == 3)
             {
-                gradeSkip++;
-                gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
+                var rosterSpacing = row + BMRAROSTERSPACE + 2;
+                rosterFirstName = rosterSheet.Cells[rosterSpacing, 2].Value?.ToString();
+                rosterLastName = rosterSheet.Cells[rosterSpacing, 3].Value?.ToString();
+                rosterEmail = rosterSheet.Cells[rosterSpacing, 4].Value?.ToString();
+            }
+            if (rosterType == 4)
+            {
+                var rosterSpacing = row + GRADESPACE + 1; // Use GRADESPACE + 1 since it's only skipping the header
+                rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 3].Value?.ToString();
+                while (rosterFirstName != gradesFirstName)
+                {
+                    skip++;
+                    rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 3].Value?.ToString();
+                }
+                rosterLastName = rosterSheet.Cells[rosterSpacing + skip, 2].Value?.ToString();
+                rosterEmail = rosterSheet.Cells[rosterSpacing + skip, 4].Value?.ToString();
             }
 
-            var gradesFirstName = gradesSheet.Cells[gradeSpacing + gradeSkip, 3].Value?.ToString();
-            var gradesLastName = gradesSheet.Cells[gradeSpacing + gradeSkip, 5].Value?.ToString();
 
             var firstName = rosterFirstName ?? "";
             var lastName = rosterLastName ?? "";
@@ -143,7 +170,7 @@ public class DataRead
             // Case where certs need to be created
             var cert = "No Certificate Found";
             // If Certs are already created
-            if (createCerts == false && rosterFirstName != null)
+            if (createCerts == false && rosterFirstName != null && certPath != "SD")
             {
                 var fullName = $"{firstName} {lastName}";
                 cert = MatchCert(fullName);
@@ -151,7 +178,7 @@ public class DataRead
 
             if (rosterFirstName == gradesFirstName && rosterLastName == gradesLastName && rosterFirstName != null)
             {
-                Student student = new Student(firstName, lastName, email, cert, GradeCheck(grade));
+                Student student = new Student(firstName, lastName, email, cert, GradeCheck(grade), grade);
                 Course.AddStudent(student);
             }
         }
@@ -171,23 +198,10 @@ public class DataRead
         return false;
     }
 
-    public Course CourseReader(ExcelWorksheet rosterSheet, ExcelWorksheet gradesSheet, string fileName, int rosterType)
+    public Course CourseReader(ExcelWorksheet gradesSheet, string fileName)
     {
         // Varibles for data gathered from the course sheet
-        var instructor = "";
-/*            if (rosterType == 1)
-        {
-            *//*instructor = rosterSheet.Cells[7, 10].Value?.ToString();
-            instructor = ColonSplit(instructor ?? "");*//*
-            instructor = "";
-        }
-        if (rosterType == 2)
-        {
-            // MissingInfoForm missingInfoForm = new MissingInfoForm();
-            // missingInfoForm.ShowDialog();
-            //instructor = missingInfoForm.MissingData;
-            instructor = ""; // Instructor doesn't really play a role rn so we can just skip this for simplicity
-        }*/
+        var instructor = ""; // instructor not used
 
         var courseName = gradesSheet.Cells[2, 7].Value?.ToString();
         var courseId = gradesSheet.Cells[2, 1].Value?.ToString();
@@ -227,6 +241,10 @@ public class DataRead
 
     private void BuildCertMap()
     {
+        if (certPath == "SD") 
+        {
+            return;
+        }
         // Get all the PDF files in the specified directory
         var files = System.IO.Directory.GetFiles(certPath, "*.pdf");
 
@@ -267,26 +285,39 @@ public class DataRead
         }
     }
 
-    private static bool IsBMRARoster(ExcelPackage rosterExcel)
+    private static int IsBMRARoster(ExcelPackage rosterExcel)
     {
         var worksheet = rosterExcel.Workbook.Worksheets[0]; // get the first worksheet
         var cell = worksheet.Cells["A1"]; // get the cell A1
         var value = cell.Value; // get the value of the cell A1
-        var a1Data = value.ToString();
+        var a1Data = value?.ToString() ?? "null";
 
         // Hardcoded the default Roster
-        if (value != null && rosterExcel != null && a1Data != null)
+        if (a1Data != null && rosterExcel != null)
         {
+            // disa/bmra
             if (a1Data.Contains("BUSINESS MANAGEMENT RESEARCH ASSOCIATES, INC"))
             {
-                return true;
+                switch (worksheet.Cells["E11"].Value)
+                {
+                    case "Lunch: ":
+                        return 3;
+                    default:
+                        return 1;
+                }
             }
-            else
+            // pm
+            if (a1Data.Contains("Last Name"))
             {
-                return false;
+                return 2;
+            }
+            //cps
+            if (a1Data.Contains("null"))
+            {
+                return 4;
             }
         }
-        return false;
+        return 0;
     }
 
 }
