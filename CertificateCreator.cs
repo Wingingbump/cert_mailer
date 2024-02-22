@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using iText.Kernel.Pdf;
+using iText.Layout.Properties;
 using OfficeOpenXml;
 using Spire.Doc;
 using System.IO.Compression;
@@ -14,11 +15,14 @@ namespace cert_mailer
         private string certificateName;
         private string certPath;
         private ExcelWorksheet gradeSheet;
+        private bool addClu;
 
-        public CertificateCreator(ExcelWorksheet gradeSheet, string certPath, Course course, EnumCertificateType.CertificateType enumCertType)
+        // construct and intialize
+        public CertificateCreator(ExcelWorksheet gradeSheet, string certPath, Course course, EnumCertificateType.CertificateType enumCertType, bool addClu)
         {
             this.course = course;
             this.certPath = certPath;
+            this.addClu = addClu;
             certificateName = course.CourseNamingScheme;
 
             // Get the Grades sheet
@@ -40,6 +44,10 @@ namespace cert_mailer
             var endDate = course.EndDate;
             var location = course.Location;
             var clp = gradesSheet.Cells[2, 12].Value;
+            var clu = "";
+            if (addClu == true) {
+                clu = ", " + clp + " CLUs";
+            }
 
             // For all rows with data
             var rowCount = gradesSheet.Cells
@@ -82,6 +90,7 @@ namespace cert_mailer
                             { "LNAME", lastName ?? "null lastname"},
                             { "COURSE", courseName },
                             { "CLPS", clp.ToString() ?? "null clp"},
+                            { "CLUS", clu.ToString()},
                             { "LOCATION", location },
                             { "START_DATE", startDate.ToString("M/d/yyyy") },
                             { "END_DATE", "" }
@@ -95,6 +104,7 @@ namespace cert_mailer
                             { "LNAME", lastName ?? "null lastname"},
                             { "COURSE", courseName },
                             { "CLPS", clp.ToString() ?? "null clp"},
+                            { "CLUS", clu.ToString()},
                             { "LOCATION", location },
                             { "START_DATE", startDate.ToString("M/d/yyyy") },
                             { "END_DATE", " - " + endDate.ToString("M/d/yyyy") }
