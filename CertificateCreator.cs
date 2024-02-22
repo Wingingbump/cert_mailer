@@ -46,7 +46,7 @@ namespace cert_mailer
             var clp = gradesSheet.Cells[2, 12].Value;
             var clu = "";
             if (addClu == true) {
-                clu = ", " + clp + " CLUs";
+                clu = ", " + clp + " PDUs";
             }
 
             // For all rows with data
