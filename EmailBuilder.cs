@@ -81,7 +81,8 @@ public class EmailBuilder
         else
         {
             defaultMessage = "Hello, <br><br>" +
-                 "The score for your Internal Controls for Grants course; BMRA reference number " +
+                 "The score for your" + course +
+                 "; BMRA reference number " +
                  BMRARef +
                  " is " +
                  Grade +
