@@ -132,10 +132,21 @@ public class DataRead
             {
                 var rosterSpacing = row + GRADESPACE; // Use GRADESPACE since it's only skipping the header
                 var rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
-                while (rosterPass == "N")
+                if (certPath.Equals("SD"))
                 {
-                    skip++;
-                    rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
+                    while (rosterPass == "N" && rosterSheet.Cells[rosterSpacing + skip, 8].Value?.ToString() == "N")
+                    {
+                        skip++;
+                        rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
+                    }
+                }
+                else
+                {
+                    while (rosterPass == "N")
+                    {
+                        skip++;
+                        rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
+                    }
                 }
                 rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 2].Value?.ToString();
                 rosterLastName = rosterSheet.Cells[rosterSpacing + skip, 1].Value?.ToString();
