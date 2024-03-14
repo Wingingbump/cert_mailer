@@ -298,7 +298,13 @@ public class DataRead
 
     private static int IsBMRARoster(ExcelPackage rosterExcel)
     {
-        var worksheet = rosterExcel.Workbook.Worksheets[0]; // get the first worksheet
+        // var worksheet = rosterExcel.Workbook.Worksheets[0]; // get the first worksheet
+        var worksheet = rosterExcel.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name.Contains("EOC"));
+        // if not EOC Page
+        if (worksheet == null)
+        {
+            worksheet = rosterExcel.Workbook.Worksheets[0]; // get the first worksheet
+        }
         var cell = worksheet.Cells["A1"]; // get the cell A1
         var value = cell.Value; // get the value of the cell A1
         var a1Data = value?.ToString() ?? "null";
