@@ -49,6 +49,11 @@ namespace cert_mailer
                 clu = ", " + clp + " PDUs";
             }
 
+            // Make a DNS folder
+            string DNSpath = certPath + "\\DNS";
+            Directory.CreateDirectory(DNSpath);
+            var DNScounter = 0;
+
             // For all rows with data
             var rowCount = gradesSheet.Cells
             .Select(cell => cell.Start.Row)
@@ -135,7 +140,13 @@ namespace cert_mailer
                     // Save the modified document
                     document.Save();
                 }
+                // if student fail place their cert in DNS
                 string PDFOutputPath = Path.ChangeExtension(outputPath, ".pdf");
+                if (course.Students[row-1].Pass == false)
+                {
+                    DNScounter++;
+                    PDFOutputPath = Path.Combine(certPath, "DNS", Path.GetFileName(outputPath) + ".pdf");
+                }
                 ConvertToPdf(outputPath, PDFOutputPath);
                 DeleteDocx(outputPath);
             });

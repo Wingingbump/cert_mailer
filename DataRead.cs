@@ -91,6 +91,16 @@ public class DataRead
         }
     }
 
+    /*
+   * Reads student data from Excel worksheets and processes them accordingly.
+   * Read data from the rosterSheet and gradesSheet cross-referencing to ensure sync'd info.
+   * Adds all students who completed the course (pass or fail) to the course's student list
+   * 
+   * @param rosterSheet The Excel worksheet containing roster information.
+   * @param gradesSheet The Excel worksheet containing student grades.
+   * @param rosterType An integer representing the type of roster (1: BMRA, 2: VA, 3: DISA, 4: VA CPS).
+   * @param createCerts A boolean indicating whether certificates need to be created.
+   */
     public void StudentReader(ExcelWorksheet rosterSheet, ExcelWorksheet gradesSheet, int rosterType, bool createCerts)
     {
         // Compare the data in each row
@@ -105,11 +115,11 @@ public class DataRead
             if (certPath.Equals("SD") && gradesGrade != null) {
                 gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
             }
-            else if (gradesGrade != null && !GradeCheck(gradesGrade))
+/*            else if (gradesGrade != null && !GradeCheck(gradesGrade))
             {
                 gradeSkip++;
                 gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
-            }
+            }*/
 
             var gradesFirstName = gradesSheet.Cells[gradeSpacing + gradeSkip, 3].Value?.ToString();
             var gradesLastName = gradesSheet.Cells[gradeSpacing + gradeSkip, 5].Value?.ToString();
@@ -132,34 +142,23 @@ public class DataRead
             {
                 var rosterSpacing = row + GRADESPACE; // Use GRADESPACE since it's only skipping the header
                 var rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
-                if (certPath.Equals("SD"))
+                while (rosterPass == "N" && rosterSheet.Cells[rosterSpacing + skip, 8].Value?.ToString() == "N")
                 {
-                    while (rosterPass == "N" && rosterSheet.Cells[rosterSpacing + skip, 8].Value?.ToString() == "N")
-                    {
-                        skip++;
-                        rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
-                    }
-                }
-                else
-                {
-                    while (rosterPass == "N")
-                    {
-                        skip++;
-                        rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
-                    }
+                    skip++;
+                    rosterPass = rosterSheet.Cells[rosterSpacing + skip, 7].Value?.ToString();
                 }
                 rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 2].Value?.ToString();
                 rosterLastName = rosterSheet.Cells[rosterSpacing + skip, 1].Value?.ToString();
                 rosterEmail = rosterSheet.Cells[rosterSpacing + skip, 3].Value?.ToString();
             }
-            else if (rosterType == 3)
+            else if (rosterType == 3) // DISA
             {
                 var rosterSpacing = row + BMRAROSTERSPACE + 2;
                 rosterFirstName = rosterSheet.Cells[rosterSpacing, 2].Value?.ToString();
                 rosterLastName = rosterSheet.Cells[rosterSpacing, 3].Value?.ToString();
                 rosterEmail = rosterSheet.Cells[rosterSpacing, 4].Value?.ToString();
             }
-            if (rosterType == 4)
+            if (rosterType == 4) // VA CPS
             {
                 var rosterSpacing = row + GRADESPACE + 1; // Use GRADESPACE + 1 since it's only skipping the header
                 rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 3].Value?.ToString();
