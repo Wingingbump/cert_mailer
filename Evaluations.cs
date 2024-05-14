@@ -345,6 +345,9 @@ public class Evaluations
         // Replace "Sep." with "Sept."
         dateRange = dateRange.Replace("Sep.", "Sept.");
 
+        // Replace "May." with "May"
+        dateRange = dateRange.Replace("May.", "May");
+
         outputSheet.HeaderFooter.OddHeader.RightAlignedText = $"BMRA Ref: {courseCode} \r\n DATE: {dateRange}";
 
         // Footer for Evaluation Summary
