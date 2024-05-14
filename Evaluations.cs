@@ -85,6 +85,8 @@ public class Evaluations
         }
 
     }
+
+    // I suck at coding lmao this should return a struct with both dicts then pass it to the next function but i'm lazy
     public void evalReader(ExcelWorksheet evalSheet)
     {
         int rowCount = evalSheet.Dimension.Rows;
@@ -354,6 +356,21 @@ public class Evaluations
         outputSheet.HeaderFooter.OddFooter.LeftAlignedText = $"Name of course: {courseABV}";
         outputSheet.HeaderFooter.OddFooter.CenteredText = $"{agency} - Virtual";
         outputSheet.HeaderFooter.OddFooter.RightAlignedText = $"Instructor: {instructor}";
+
+        // Update basic info on the calcs sheet
+        outputSheet = outputPath.Workbook.Worksheets["calcs"];
+
+        outputSheet.Cells["A3"].Value = courseCode; // Course ID
+
+        outputSheet.Cells["C3"].Value = courseABV + " " + agency; // Course Name + Agency
+
+        outputSheet.Cells["D3"].Value = dateRange; // Date
+
+        outputSheet.Cells["A9"].Value = courseCode; // Course ID
+
+        outputSheet.Cells["C9"].Value = courseABV + " " + agency; // Course Name + Agency
+
+        outputSheet.Cells["D9"].Value = dateRange; // Date
 
 
         // Save the file
