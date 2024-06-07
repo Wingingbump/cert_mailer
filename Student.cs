@@ -12,7 +12,6 @@ public class Student
     {
         get;
     }
-
     /// <summary>
     /// Gets the last name of the student.
     /// </summary>
@@ -20,7 +19,6 @@ public class Student
     {
         get;
     }
-
     /// <summary>
     /// Gets the email of the student.
     /// </summary>
@@ -28,7 +26,6 @@ public class Student
     {
         get;
     }
-
     /// <summary>
     /// Gets or sets the certification of the student.
     /// </summary>
@@ -36,7 +33,6 @@ public class Student
     {
         get; set;
     }
-
     /// <summary>
     /// Gets or sets a value indicating whether the student passed the certification.
     /// </summary>
@@ -44,7 +40,6 @@ public class Student
     {
         get; set;
     }
-
     /// <summary>
     /// Gets or sets the grade of the student.
     /// </summary>

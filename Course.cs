@@ -38,7 +38,6 @@
         /// Course End Date
         /// </summary>
         public DateTime EndDate { get; set; }
-
         /// <summary>
         /// List of all students who participated in the course.
         /// Includes students who pass or fail, but not students who did not complete the course 

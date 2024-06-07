@@ -150,6 +150,10 @@ namespace cert_mailer
                 ConvertToPdf(outputPath, PDFOutputPath);
                 DeleteDocx(outputPath);
             });
+            if (DNScounter == 0)
+            {
+                Directory.Delete(DNSpath, true);
+            }
         }
 
         public void ConvertToPdf(string docxPath, string pdfPath)
