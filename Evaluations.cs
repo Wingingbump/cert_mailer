@@ -2,8 +2,10 @@
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using iText.Layout.Properties;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using BottomBorder = DocumentFormat.OpenXml.Wordprocessing.BottomBorder;
 using InsideHorizontalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder;
 using InsideVerticalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder;
@@ -81,6 +83,9 @@ public class Evaluations
         // If the worksheet exists, read the evaluations.
         if (evalSheet != null)
         {
+            if (type.Equals("SalesForce")) {
+                SFevalReader(evaluationExcel);
+            }
             evalReader(evalSheet);
         }
 
@@ -123,7 +128,7 @@ public class Evaluations
             questionRatingCounts.Add("Question11", new int[5]);
             questionRatingCounts.Add("Question14", new int[5]);
             questionRatingCounts.Add("Question15", new int[5]);
-            questionRatingCounts.Add("Question16", new int[5]);
+            questionRatingCounts.Add("Question16", new int[5]); // 13 questions
         }
 
         // Initialize comment count
@@ -142,7 +147,7 @@ public class Evaluations
             buffer2 = 5;
         }
 
-        for (var row = 2; row <= rowCount; row++)
+        for (int row = 2; row <= rowCount; row++)
         {
             // Yes/No questions
             // Count the "Yes" and "No" responses separately
@@ -480,6 +485,72 @@ public class Evaluations
         commentOutputPath.Save();
     }
 
+    public void SFevalReader(ExcelPackage evaluationExcel)
+    {
+        var ratingSheet = evaluationExcel.Workbook.Worksheets.First(); // Ratings sheet
+        const int ratingRow = 13; // constant rating range (poor...) row 
+        const int startingRow = 15; // First question
+        const int startingCol = 4; // First question
+
+        // Data structures to hold all of the data
+        Dictionary<string, string[]> comments = new Dictionary<string, string[]>();
+
+        /**
+         * Index 0 for "No", Index 1 for "Yes"
+         * Index 0 for "Poor", Index 4 for "Excellent"
+         * Index 0 for "Not Recommend", Index 1 for "Recommend"
+         * 13 questions
+         */
+
+        // Define a dictionary with question names and their respective array sizes
+        var questions = new Dictionary<string, int[]>
+        {
+            { "Question1", new int[2] }, // 1. Did this course meet its stated learning objectives?
+            { "Question2", new int[2] }, // 2. Did this course meet your personal reasons or objectives for taking this course?
+            { "Question3", new int[5] }, // 3. What would you rate this course overall?
+            { "Question4", new int[5] }, // 4. What would you rate this instructor overall?
+            { "Question5", new int[5] }, // 5. How would you rate the virtual platform?
+            { "Question7", new int[2] }, // 7. How likely are you to recommend a BMRA course to a friend or colleague?
+            { "Question8", new int[5] }, // 8. How well structured/organized was the course material?
+            { "Question9", new int[5] }, // 9. How engaging was the course overall?
+            { "Question10", new int[5] }, // 10. How engaging was the course presentation?
+            { "Question11", new int[5] }, // 11. How helpful were the course exercises?
+            { "Question14", new int[5] }, // 14. How well did the Instructor demonstrate knowledge of the subject?
+            { "Question15", new int[5] }, // 15. How successful was the Instructor in making the virtual course engaging?
+            { "Question16", new int[5] }  // 16. How successfully did the Instructor answer questions?
+        };
+
+        // ==========================
+        // Update the Rating Questions
+        // ==========================
+
+
+        // Establishes the x range of the 2d question array (Ratings)
+        var ratingPointer = ratingSheet.Cells[ratingRow, 4].Value.ToString(); // row
+        var ratingRange = new List<int>();
+        while (ratingPointer != "Total")
+        {
+            var ratingNumber = int.Parse(ratingPointer.Split('-')[0]);
+            ratingRange.Add(ratingNumber);
+        }
+
+        // Establishes the y range of the 2d question array (Questions)
+        var ratingQuestionRows = 10 + startingRow; // all rating questions
+        var ratingCountRange = ratingRange.Count(); // Numeric Range Max
+        for (var row = startingRow ; row < ratingQuestionRows; row++)
+        {
+            var questionBuffer = 3;
+            for (var col = startingCol; col < ratingCountRange + startingCol; col++)
+            {
+                if (questionBuffer == 7) questionBuffer++; // Skip question 7
+                var questionNumber = "Question" + (questionBuffer);
+                var intRating = (int)ratingSheet.Cells[row, col].Value;
+                questions[questionNumber][ratingRange[col - startingRow]] = intRating;
+                questionBuffer++;
+            }
+        }
+
+    }
     // Create a helper method to generate a paragraph with bullet formatting and line spacing
     Paragraph CreateParagraphWithBullet(string question, string comment)
     {
