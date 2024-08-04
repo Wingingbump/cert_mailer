@@ -15,9 +15,10 @@ namespace cert_mailer
         static void Main()
         {
             //string evalpath = @"F:\Leadership Skills - End of Course Survey.xlsx";
-            string evalpath = @"F:\BMRA_code\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\Production\Internal Controls for Grants Course Evaluation - 11023.0001.xlsx";
+            //string evalpath = @"F:\BMRA_code\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\Production\Internal Controls for Grants Course Evaluation - 11023.0001.xlsx";
+            string evalpath = @"F:\BMRA_code\work_project\TestEnv\SF Eval Example 2.xlsx";
             string EOCpath = @"F:\BMRA_code\work_project\TestEnv\test";
-            string type = "Default";
+            string type = "SalesForce";
             DateTime startDate = new DateTime(2023, 6, 20);
             DateTime endDate = new DateTime(2023, 6, 23);
             FileInfo evalInfo = new FileInfo(evalpath);

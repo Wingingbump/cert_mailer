@@ -5,6 +5,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using iText.Layout.Properties;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
+using Windows.Graphics.Printing3D;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using BottomBorder = DocumentFormat.OpenXml.Wordprocessing.BottomBorder;
 using InsideHorizontalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder;
@@ -83,10 +84,14 @@ public class Evaluations
         // If the worksheet exists, read the evaluations.
         if (evalSheet != null)
         {
-            if (type.Equals("SalesForce")) {
+            if (type.Equals("SalesForce"))
+            {
                 SFevalReader(evaluationExcel);
             }
-            evalReader(evalSheet);
+            else
+            {
+                evalReader(evalSheet);
+            }
         }
 
     }
@@ -488,8 +493,6 @@ public class Evaluations
     public void SFevalReader(ExcelPackage evaluationExcel)
     {
         var ratingSheet = evaluationExcel.Workbook.Worksheets.First(); // Ratings sheet
-        const int ratingRow = 13; // constant rating range (poor...) row 
-        const int startingRow = 15; // First question
         const int startingCol = 4; // First question
 
         // Data structures to hold all of the data
@@ -524,31 +527,42 @@ public class Evaluations
         // Update the Rating Questions
         // ==========================
 
+        // Get the rating table start
+        int ratingRow = SearchRating(ratingSheet); // rating range (poor...) row 
+        int startingRow = ratingRow + 2; // First question 2 rows down
 
         // Establishes the x range of the 2d question array (Ratings)
         var ratingPointer = ratingSheet.Cells[ratingRow, 4].Value.ToString(); // row
         var ratingRange = new List<int>();
+        var index = 0;
         while (ratingPointer != "Total")
         {
             var ratingNumber = int.Parse(ratingPointer.Split('-')[0]);
             ratingRange.Add(ratingNumber);
+            index++;
+            ratingPointer = ratingSheet.Cells[ratingRow, 4 + index].Value.ToString();
         }
 
         // Establishes the y range of the 2d question array (Questions)
         var ratingQuestionRows = 10 + startingRow; // all rating questions
         var ratingCountRange = ratingRange.Count(); // Numeric Range Max
+        int[] skipQuestions = {6, 7, 12, 13};
+        var questionBuffer = 3;
         for (var row = startingRow ; row < ratingQuestionRows; row++)
         {
-            var questionBuffer = 3;
-            for (var col = startingCol; col < ratingCountRange + startingCol; col++)
+            while (skipQuestions.Contains(questionBuffer))
             {
-                if (questionBuffer == 7) questionBuffer++; // Skip question 7
-                var questionNumber = "Question" + (questionBuffer);
-                var intRating = (int)ratingSheet.Cells[row, col].Value;
-                questions[questionNumber][ratingRange[col - startingRow]] = intRating;
                 questionBuffer++;
             }
+            for (var col = startingCol; col < ratingCountRange + startingCol; col++)
+            {
+                var questionNumber = "Question" + (questionBuffer);
+                int intRating = ratingSheet.Cells[row, col].Value is double doubleValue ? (int)doubleValue : int.Parse(ratingSheet.Cells[row, col].Value.ToString());
+                questions[questionNumber][ratingRange[col - startingCol]-1] = intRating;
+            }
+            questionBuffer++;
         }
+        PrintQuestionDictionary(questions);
 
     }
     // Create a helper method to generate a paragraph with bullet formatting and line spacing
@@ -681,5 +695,47 @@ public class Evaluations
         // Default to 0 if the rating is not found or cannot be parsed
         return 0;
     }
+
+    // SF helper to search for the rating table
+    private int SearchRating(ExcelWorksheet sheet)
+    {
+        // Start at the first row
+        int row = 1;
+        // Maximum number of rows to traverse
+        int maxTraverse = 50;
+
+        // Traverse down column B, up to a maximum of 50 rows
+        while (row <= maxTraverse)
+        {
+            var cellValue = sheet.Cells[row, 2].Value?.ToString();
+
+            // Check if the cell contains the word "Rating", case sensitive
+            if (!string.IsNullOrEmpty(cellValue) && cellValue.Contains("Rating"))
+            {
+                return row;
+            }
+
+            row++;
+        }
+
+        // If "Rating" is not found, return -1 or another appropriate value to indicate failure
+        return -1;
+    }
+
+    // Helper to print the Question Dict
+    private void PrintQuestionDictionary(Dictionary<string, int[]> questions)
+    {
+        foreach (var question in questions)
+        {
+            Console.Write(question.Key + ": ");
+            foreach (var value in question.Value)
+            {
+                Console.Write(value + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+
+
 
 }
