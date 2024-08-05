@@ -492,7 +492,7 @@ public class Evaluations
 
     public void SFevalReader(ExcelPackage evaluationExcel)
     {
-        var ratingSheet = evaluationExcel.Workbook.Worksheets.First(); // Ratings sheet
+        var currSheet = evaluationExcel.Workbook.Worksheets.First(); // Current sheet
         const int startingCol = 4; // First question
 
         // Data structures to hold all of the data
@@ -528,11 +528,11 @@ public class Evaluations
         // ==========================
 
         // Get the rating table start
-        int ratingRow = SearchRating(ratingSheet); // rating range (poor...) row 
+        int ratingRow = SearchRating(currSheet); // rating range (poor...) row 
         int startingRow = ratingRow + 2; // First question 2 rows down
 
         // Establishes the x range of the 2d question array (Ratings)
-        var ratingPointer = ratingSheet.Cells[ratingRow, 4].Value.ToString(); // row
+        var ratingPointer = currSheet.Cells[ratingRow, 4].Value.ToString(); // row
         var ratingRange = new List<int>();
         var index = 0;
         while (ratingPointer != "Total")
@@ -540,7 +540,7 @@ public class Evaluations
             var ratingNumber = int.Parse(ratingPointer.Split('-')[0]);
             ratingRange.Add(ratingNumber);
             index++;
-            ratingPointer = ratingSheet.Cells[ratingRow, 4 + index].Value.ToString();
+            ratingPointer = currSheet.Cells[ratingRow, 4 + index].Value.ToString();
         }
 
         // Establishes the y range of the 2d question array (Questions)
@@ -557,11 +557,48 @@ public class Evaluations
             for (var col = startingCol; col < ratingCountRange + startingCol; col++)
             {
                 var questionNumber = "Question" + (questionBuffer);
-                int intRating = ratingSheet.Cells[row, col].Value is double doubleValue ? (int)doubleValue : int.Parse(ratingSheet.Cells[row, col].Value.ToString());
+                int intRating = currSheet.Cells[row, col].Value is double doubleValue ? (int)doubleValue : int.Parse(currSheet.Cells[row, col].Value.ToString());
                 questions[questionNumber][ratingRange[col - startingCol]-1] = intRating;
             }
             questionBuffer++;
         }
+
+        // ==========================
+        // Update the Yes/No Questions
+        // ==========================
+        currSheet = evaluationExcel.Workbook.Worksheets[1]; // Yes/No
+
+        // Get the y/n table start
+        ratingRow = SearchRating(currSheet); // y/n row 
+        startingRow = ratingRow + 2; // First question 2 rows down
+
+        // Establishes the x range of the 2d question array (Ratings)
+        ratingPointer = currSheet.Cells[ratingRow, 4].Value.ToString(); // row
+        ratingRange = new List<int>();
+        index = 0;
+        while (ratingPointer != "Total")
+        {
+            var ratingNumber = ratingPointer == "NO" ? 0 : 1;
+            ratingRange.Add(ratingNumber);
+            index++;
+            ratingPointer = currSheet.Cells[ratingRow, 4 + index].Value.ToString();
+        }
+
+        // Establishes the y range of the 2d question array (Questions)
+        ratingQuestionRows = 2 + startingRow; // all rating questions
+        ratingCountRange = ratingRange.Count(); // Numeric Range Max
+        questionBuffer = 1;
+        for (var row = startingRow; row < ratingQuestionRows; row++)
+        {
+            for (var col = startingCol; col < ratingCountRange + startingCol; col++)
+            {
+                var questionNumber = "Question" + (questionBuffer);
+                int intRating = currSheet.Cells[row, col].Value is double doubleValue ? (int)doubleValue : int.Parse(currSheet.Cells[row, col].Value.ToString());
+                questions[questionNumber][ratingRange[col - startingCol]] = intRating;
+            }
+            questionBuffer++;
+        }
+
         PrintQuestionDictionary(questions);
 
     }
@@ -700,7 +737,7 @@ public class Evaluations
     private int SearchRating(ExcelWorksheet sheet)
     {
         // Start at the first row
-        int row = 1;
+        int row = 5;
         // Maximum number of rows to traverse
         int maxTraverse = 50;
 
@@ -710,7 +747,7 @@ public class Evaluations
             var cellValue = sheet.Cells[row, 2].Value?.ToString();
 
             // Check if the cell contains the word "Rating", case sensitive
-            if (!string.IsNullOrEmpty(cellValue) && cellValue.Contains("Rating"))
+            if (!string.IsNullOrEmpty(cellValue) && (cellValue.Contains("Rating") || (cellValue.Contains("Choice") && !cellValue.Contains("Value"))))
             {
                 return row;
             }
