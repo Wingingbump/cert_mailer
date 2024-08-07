@@ -599,6 +599,35 @@ public class Evaluations
             questionBuffer++;
         }
 
+        // ==========================
+        // Update the NPS Questions
+        // ==========================
+        currSheet = evaluationExcel.Workbook.Worksheets[2];
+
+        // Get the NPS table start
+        ratingRow = SearchRating(currSheet); // NPS row 
+        startingRow = ratingRow + 2; // First question 2 rows down
+
+        // Establishes the x range of the 2d question array (Ratings)
+        ratingPointer = currSheet.Cells[ratingRow, 4].Value.ToString(); // row
+        ratingRange = new List<int>();
+        index = 0;
+        while (ratingPointer != "Total")
+        {
+            var ratingNumber = ratingPointer == "Not at all Likely" ? 0 : 1;
+            ratingRange.Add(ratingNumber);
+            index++;
+            ratingPointer = currSheet.Cells[ratingRow, 4 + index].Value.ToString();
+        }
+
+        // Establishes the y range of the 2d question array (Questions)
+        ratingCountRange = ratingRange.Count(); // Numeric Range Max
+        for (var col = startingCol; col < ratingCountRange + startingCol; col++)
+        {
+            int intRating = currSheet.Cells[startingRow, col].Value is double doubleValue ? (int)doubleValue : int.Parse(currSheet.Cells[startingRow, col].Value.ToString());
+            questions["Question7"][ratingRange[col - startingCol]] = intRating;
+        }
+
         PrintQuestionDictionary(questions);
 
     }
@@ -747,7 +776,7 @@ public class Evaluations
             var cellValue = sheet.Cells[row, 2].Value?.ToString();
 
             // Check if the cell contains the word "Rating", case sensitive
-            if (!string.IsNullOrEmpty(cellValue) && (cellValue.Contains("Rating") || (cellValue.Contains("Choice") && !cellValue.Contains("Value"))))
+            if (!string.IsNullOrEmpty(cellValue) && (cellValue.Contains("Rating") || (cellValue.Contains("Choice") && !cellValue.Contains("Value")) || cellValue.Contains("NPS")))
             {
                 return row;
             }
