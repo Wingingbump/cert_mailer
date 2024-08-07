@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Presentation;
 using DocumentFormat.OpenXml.Wordprocessing;
 using iText.Layout.Properties;
 using OfficeOpenXml;
@@ -64,6 +65,19 @@ public class Evaluations
     {
         get; set;
     }
+
+
+    // Create a HashSet to store the responses to omit with case-insensitive matching
+    readonly HashSet<string> omittedResponses = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "None",
+                "NA",
+                "N/A",
+                "No",
+                "No Response",
+                "Not Applicable",
+                "Not at this time"
+            };
 
     public Evaluations(FileInfo evaluation, string EOCpath, string type, string courseCode, DateTime startDate, DateTime endDate, string instructor, string agency, string courseName, string attendance, string courseABV)
     {
@@ -201,18 +215,6 @@ public class Evaluations
             userResponse[1] = evalSheet.Cells[row, 13 + buffer].Value?.ToString() ?? "";
             userResponse[2] = evalSheet.Cells[row, 18 + buffer].Value?.ToString() ?? "";
             userResponse[3] = evalSheet.Cells[row, 19 + buffer2].Value?.ToString() ?? ""; // Additional buffer for Default evaluations
-
-            // Create a HashSet to store the responses to omit with case-insensitive matching
-            HashSet<string> omittedResponses = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "None",
-                "NA",
-                "N/A",
-                "No",
-                "No Response",
-                "Not Applicable",
-                "Not at this time"
-            };
 
             // Update the omitted responses to blanks
             for (int i = 0; i < userResponse.Length; i++)
@@ -495,8 +497,7 @@ public class Evaluations
         var currSheet = evaluationExcel.Workbook.Worksheets.First(); // Current sheet
         const int startingCol = 4; // First question
 
-        // Data structures to hold all of the data
-        Dictionary<string, string[]> comments = new Dictionary<string, string[]>();
+        // Data structure to hold question data
 
         /**
          * Index 0 for "No", Index 1 for "Yes"
@@ -629,6 +630,43 @@ public class Evaluations
         }
 
         PrintQuestionDictionary(questions);
+
+        // ==========================
+        // Update the Comments
+        // ==========================
+        currSheet = evaluationExcel.Workbook.Worksheets[3];
+
+        var comments = new Dictionary<string, List<string>>()
+        {
+            { "Question1", new List<string>() }, // 1. Do you have any feedback about the virtual platform?
+            { "Question2", new List<string>() }, // 2. Any comments about the course materials, presentation, or exercises?
+            { "Question3", new List<string>() }, // 3. Do you have any comments about the Instructor?
+            { "Question4", new List<string>() } // 4. Anything else you'd like to tell us?
+        };
+
+        // Get the comments table start
+        ratingRow = SearchComment(currSheet); // NPS row 
+        startingRow = ratingRow + 1; // First question 1 row down
+
+        var commentQuestionCol = 3;
+        var commentAnswerCol = 5;
+
+        questionBuffer = 0;
+        var currRow = startingRow;
+        // While Comments are in the comment col
+        while (currSheet.Cells[currRow, commentAnswerCol].Value != null)
+        {
+            // If A new question comes up then switch to next question
+            if (!currSheet.Cells[currRow, commentQuestionCol].Value.ToString().Equals("", StringComparison.Ordinal))
+            {
+                questionBuffer++;
+            }
+            var questionNumber = "Question" + (questionBuffer);
+            comments[questionNumber].Add(currSheet.Cells[currRow, commentAnswerCol].Value.ToString());
+            currRow++;
+        }
+        PrintSFComments(comments);
+
 
     }
     // Create a helper method to generate a paragraph with bullet formatting and line spacing
@@ -788,6 +826,35 @@ public class Evaluations
         return -1;
     }
 
+    // SF helper to search for the Comment table
+    private int SearchComment(ExcelWorksheet sheet)
+    {
+        // Start at the first row
+        int row = 10;
+        // Maximum number of rows to traverse
+        int maxTraverse = 50;
+
+        // Traverse down column B, up to a maximum of 50 rows
+        while (row <= maxTraverse)
+        {
+            var cellValue = sheet.Cells[row, 2].Value?.ToString();
+            var cellValue2 = sheet.Cells[row, 3].Value?.ToString();
+
+            // Check if the cell contains the word "Rating", case sensitive
+            if (!string.IsNullOrEmpty(cellValue) && cellValue.Contains("Class: Class ID") &&
+                !string.IsNullOrEmpty(cellValue2) && cellValue2.Contains("Question: Name"))
+            {
+                return row;
+            }
+
+
+            row++;
+        }
+
+        // If "Rating" is not found, return -1 or another appropriate value to indicate failure
+        return -1;
+    }
+
     // Helper to print the Question Dict
     private void PrintQuestionDictionary(Dictionary<string, int[]> questions)
     {
@@ -797,6 +864,20 @@ public class Evaluations
             foreach (var value in question.Value)
             {
                 Console.Write(value + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+
+    // Helper to print the Comments Dict SF
+    void PrintSFComments(Dictionary<string, List<string>> comments)
+    {
+        foreach (var question in comments)
+        {
+            Console.WriteLine($"{question.Key}:");
+            foreach (var comment in question.Value)
+            {
+                Console.WriteLine($"- {comment}");
             }
             Console.WriteLine();
         }
