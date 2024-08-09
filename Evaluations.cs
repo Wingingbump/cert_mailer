@@ -69,15 +69,12 @@ public class Evaluations
 
     // Create a HashSet to store the responses to omit with case-insensitive matching
     readonly HashSet<string> omittedResponses = new(StringComparer.OrdinalIgnoreCase)
-            {
-                "None",
-                "NA",
-                "N/A",
-                "No",
-                "No Response",
-                "Not Applicable",
-                "Not at this time"
-            };
+    {
+        "None", "NA", "N/A", "No", "No Response", "Not Applicable", "Not at this time",
+        "Not Relevant", "No Answer", "Nil", "None Provided", "Unavailable",
+        "No Comment", "Not Provided", "Decline to Answer", "Declined", "No Input"
+    };
+
 
     public Evaluations(FileInfo evaluation, string EOCpath, string type, string courseCode, DateTime startDate, DateTime endDate, string instructor, string agency, string courseName, string attendance, string courseABV)
     {
@@ -629,7 +626,7 @@ public class Evaluations
             questions["Question7"][ratingRange[col - startingCol]] = intRating;
         }
 
-        PrintQuestionDictionary(questions);
+        //PrintQuestionDictionary(questions);
 
         // ==========================
         // Update the Comments
@@ -657,7 +654,7 @@ public class Evaluations
         while (currSheet.Cells[currRow, commentAnswerCol].Value != null)
         {
             // If A new question comes up then switch to next question
-            if (!currSheet.Cells[currRow, commentQuestionCol].Value.ToString().Equals("", StringComparison.Ordinal))
+            if (currSheet.Cells[currRow, commentQuestionCol].Value != null)
             {
                 questionBuffer++;
             }
@@ -665,10 +662,273 @@ public class Evaluations
             comments[questionNumber].Add(currSheet.Cells[currRow, commentAnswerCol].Value.ToString());
             currRow++;
         }
-        PrintSFComments(comments);
+
+        // Remove ommited Responses from the dict
+        foreach (var key in comments.Keys.ToList()) // Use ToList() to avoid modifying the collection while iterating
+        {
+            comments[key].RemoveAll(comment => omittedResponses.Contains(comment));
+        }
+
+        //PrintSFComments(comments);
+        CreateEvaluationTemplateSF(questions, comments);
 
 
     }
+
+    public void CreateEvaluationTemplateSF(Dictionary<string, int[]> questions, Dictionary<string, List<string>> comments)
+    {
+        // ==========================
+        // Eval Sheet
+        // ==========================
+
+        // This section is same as the non SF verion
+        var Buffer = 12;
+        // Combine path with file name
+        string output = System.IO.Path.Combine(path, "Course Evaluation Summary - " + courseCode + ".xlsx");
+        // Get template file path
+        string templatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath + "\\Assets", "Course Evaluation Summary - Template.xlsx");
+        // Copy the template file to the output path
+        System.IO.File.Copy(templatePath, output, true);
+        // Open the copied file for editing
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        using var outputPath = new ExcelPackage(new FileInfo(output));
+
+        // Get the first sheet
+        ExcelWorksheet outputSheet = outputPath.Workbook.Worksheets.FirstOrDefault();
+        int[] questionOrder = new int[] { 11, 8, 10, 9, 3, 14, 15, 16, 4, 5 };
+        int skip = 0;
+        for (int items = 6; items <= 17; items++)
+        {
+            if (items == 11 || items == 16)
+            {
+                skip++;
+                items++;
+            }
+            for (int col = 8; col <= Buffer; col++)
+            {
+                int reversedIndex = Buffer - col; // Calculate the reversed index
+                if (questions["Question" + questionOrder[items - 6 - skip]][reversedIndex] == 0)
+                {
+                    outputSheet.Cells[items, col].Value = "";
+                }
+                else
+                {
+                    outputSheet.Cells[items, col].Value = questions["Question" + questionOrder[items - 6 - skip]][reversedIndex];
+                }
+            }
+        }
+
+        // Yes/No questions
+        int[] yesNo = new int[] { 9, 11 };
+        int[] yesNoQuestions = new int[] { 2, 3, 19 };
+
+        for (int rowIndex = 0; rowIndex < yesNoQuestions.Length; rowIndex++)
+        {
+            for (int colIndex = 0; colIndex < yesNo.Length; colIndex++)
+            {
+                int reversedColIndex = yesNo.Length - 1 - colIndex; // Calculate the reversed column index
+                if (rowIndex < 2)
+                {
+                    if (questions["Question" + (rowIndex + 1)][reversedColIndex] == 0)
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = "";
+                    }
+                    else
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = questions["Question" + (rowIndex + 1)][reversedColIndex];
+                    }
+                }
+                else
+                {
+                    if (questions["Question" + (7)][reversedColIndex] == 0)
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = "";
+                    }
+                    else
+                    {
+                        outputSheet.Cells[yesNoQuestions[rowIndex], yesNo[colIndex]].Value = questions["Question" + (7)][reversedColIndex];
+                    }
+                }
+            }
+        }
+
+        // Fill out the response amount
+        outputSheet.Cells[21, 13].Value = attendance;
+        outputSheet.Cells[22, 13].Value = questions["Question1"].Sum();
+        outputSheet.Cells[23, 13].Value = comments.Count;
+
+        // Header for Evaluation Summary
+        string dateRange;
+        if (startDate.Date == endDate.Date)
+        {
+            // Same day
+            dateRange = startDate.ToString("MMM. d, yyyy");
+        }
+        else if (startDate.Month == endDate.Month && startDate.Year == endDate.Year)
+        {
+            // Same month and year
+            dateRange = startDate.ToString("MMM. d") + " - " + endDate.ToString("d, yyyy");
+        }
+        else if (startDate.Year == endDate.Year)
+        {
+            // Different months, same year
+            dateRange = startDate.ToString("MMM. d") + " - " + endDate.ToString("MMM. d, yyyy");
+        }
+        else
+        {
+            // Different months and years
+            dateRange = startDate.ToString("MMM. d, yyyy") + " - " + endDate.ToString("MMM. d, yyyy");
+        }
+
+        // Replace "Sep." with "Sept."
+        dateRange = dateRange.Replace("Sep.", "Sept.");
+
+        // Replace "May." with "May"
+        dateRange = dateRange.Replace("May.", "May");
+
+        outputSheet.HeaderFooter.OddHeader.RightAlignedText = $"BMRA Ref: {courseCode} \r\n DATE: {dateRange}";
+
+        // Footer for Evaluation Summary
+        outputSheet.HeaderFooter.OddFooter.LeftAlignedText = $"Name of course: {courseABV}";
+        outputSheet.HeaderFooter.OddFooter.CenteredText = $"{agency} - Virtual";
+        outputSheet.HeaderFooter.OddFooter.RightAlignedText = $"Instructor: {instructor}";
+
+        // Update basic info on the calcs sheet
+        outputSheet = outputPath.Workbook.Worksheets["calcs"];
+
+        outputSheet.Cells["A3"].Value = courseCode; // Course ID
+
+        outputSheet.Cells["C3"].Value = courseABV + " " + agency; // Course Name + Agency
+
+        outputSheet.Cells["D3"].Value = dateRange; // Date
+
+        outputSheet.Cells["A9"].Value = courseCode; // Course ID
+
+        outputSheet.Cells["C9"].Value = courseABV + " " + agency; // Course Name + Agency
+
+        outputSheet.Cells["D9"].Value = dateRange; // Date
+
+
+        // Save the file
+        outputPath.Save();
+
+        // ==========================
+        // Comment Sheet
+        // ==========================
+
+        // Open Comment template
+        string commentTemplatePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath + "\\Assets", "Student Comments - Template.docx");
+        // Get output path for comment
+        string commentOutput = System.IO.Path.Combine(path, "Student Comments - " + courseCode + ".docx");
+        // Copy the template file to the output path
+        System.IO.File.Copy(commentTemplatePath, commentOutput, true);
+        // Open the copied file for editing
+        using var commentOutputPath = WordprocessingDocument.Open(commentOutput, true);
+
+        // Retrieve the main document part
+        var commentMainPart = commentOutputPath.MainDocumentPart;
+        // Create a new table
+        var table = new Table();
+
+        // Create table properties
+        var tableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties(
+            new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct }, // Set table width to 100%
+            new TableBorders(
+                new TopBorder() { Val = BorderValues.Single, Size = 6, Color = "000000" }, // Top border
+                new BottomBorder() { Val = BorderValues.Single, Size = 6, Color = "000000" }, // Bottom border
+                new LeftBorder() { Val = BorderValues.Single, Size = 6, Color = "000000" }, // Left border
+                new RightBorder() { Val = BorderValues.Single, Size = 6, Color = "000000" }, // Right border
+                new InsideHorizontalBorder() { Val = BorderValues.Single, Size = 6, Color = "000000" }, // Inside horizontal border
+                new InsideVerticalBorder() { Val = BorderValues.Single, Size = 6, Color = "000000" }  // Inside vertical border
+            )
+        );
+
+        // Apply the table properties to your table
+        table.AppendChild(tableProperties);
+
+
+        // ==========================
+        // Modified section
+        // ==========================
+
+        var question = 0;
+        string[] questionList = new string[] { "Do you have any feedback about the virtual platform?", "Any comments about the course materials, presentation, or exercises?", "Do you have any comments about the Instructor?", "Anything else you'd like to tell us?" };
+        foreach (var comment in comments)
+        {
+            // Create new row
+            var tr = new TableRow();
+
+            // Edit the content of the new cell 
+            var tc = new TableCell();
+
+            // Create a list to store the generated paragraphs
+            var paragraphs = new List<Paragraph>();
+
+            // Generate the paragraphs for each question and comment
+            var commentParagraphs = CreateParagraphsWithBulletSF(questionList[question], comment.Value);
+
+            // Add each generated paragraph to the main paragraphs list
+            paragraphs.AddRange(commentParagraphs);
+
+
+            // Add the paragraphs to the cell
+            tc.Append(paragraphs);
+            // Add the cell to the row
+            tr.Append(tc);
+            // Add the row to the table
+            table.Append(tr);
+            question++;
+        }
+
+        // Append the table to the document
+        commentMainPart.Document.Body.Append(table);
+
+        // Add the End of student comments bold text
+        commentMainPart.Document.Body.Append(new Paragraph(
+            new Run(new Text("End of student comments."))
+            {
+                RunProperties = new RunProperties(new Bold())
+            }
+        ));
+
+        // Modify the document margins to remove the space at the top
+        var sectionProperties = commentMainPart.Document.Body.Elements<SectionProperties>().FirstOrDefault();
+        if (sectionProperties != null)
+        {
+            var pageMargin = sectionProperties.Elements<PageMargin>().FirstOrDefault();
+            if (pageMargin != null)
+            {
+                pageMargin.Top = 0; // Set the top margin to 0
+            }
+        }
+        var headerPart = commentMainPart.HeaderParts.FirstOrDefault();
+
+        // Check if a header part exists
+        if (headerPart != null)
+        {
+            // Iterate through the paragraphs in the header
+            foreach (var paragraph in headerPart.Header.Descendants<DocumentFormat.OpenXml.Wordprocessing.Paragraph>())
+            {
+                // Iterate through the runs in each paragraph
+                foreach (var run in paragraph.Elements<DocumentFormat.OpenXml.Wordprocessing.Run>())
+                {
+                    // Iterate through the text elements in each run
+                    foreach (var textElement in run.Elements<DocumentFormat.OpenXml.Wordprocessing.Text>())
+                    {
+                        // Replace the specific text with the updated values
+                        textElement.Text = textElement.Text.Replace("CODE", courseCode)
+                                                           .Replace("INSTRUCTOR", instructor)
+                                                           .Replace("COURSE", courseName)
+                                                           .Replace("DATE", dateRange);
+                    }
+                }
+            }
+        }
+
+        // Save the file
+        commentOutputPath.Save();
+    }
+
     // Create a helper method to generate a paragraph with bullet formatting and line spacing
     Paragraph CreateParagraphWithBullet(string question, string comment)
     {
@@ -694,6 +954,51 @@ public class Evaluations
 
         return paragraph;
     }
+
+    // Create a helper method to generate a paragraph with bullet formatting and line spacing for SF Format
+    List<Paragraph> CreateParagraphsWithBulletSF(string question, List<string> comments)
+    {
+        // Create a list to hold the paragraphs
+        var paragraphs = new List<Paragraph>();
+
+        // Create a paragraph for the question without a bullet
+        var questionParagraph = new Paragraph(
+            new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
+                new SpacingBetweenLines() { Line = "360", LineRule = LineSpacingRuleValues.Auto } // Set line spacing to 1.5
+            )
+        );
+        questionParagraph.AppendChild(new Run(new Text(question)));
+        paragraphs.Add(questionParagraph);
+
+        // Create paragraphs for each comment with a bullet
+        foreach (var comment in comments)
+        {
+            var commentParagraph = new Paragraph(
+                new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
+                    new NumberingProperties(
+                        new NumberingLevelReference() { Val = 0 }, // Bullet level
+                        new NumberingId() { Val = 1 }
+                    ),
+                    new SpacingBetweenLines() { Line = "360", LineRule = LineSpacingRuleValues.Auto }
+                )
+            );
+
+            // Add the comment text with italic formatting
+            var commentRun = new Run();
+            commentRun.AppendChild(new RunProperties(new Italic()));
+            commentRun.AppendChild(new Text(comment));
+            commentParagraph.AppendChild(commentRun);
+
+            // Add the comment paragraph to the list of paragraphs
+            paragraphs.Add(commentParagraph);
+        }
+
+        return paragraphs;
+    }
+
+
+
+
 
     private void UpdateRatingCount(int[] ratingCounts, int rating)
     {

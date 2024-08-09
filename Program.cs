@@ -16,7 +16,7 @@ namespace cert_mailer
         {
             //string evalpath = @"F:\Leadership Skills - End of Course Survey.xlsx";
             //string evalpath = @"F:\BMRA_code\work_project\TestEnv\11023.0001 SBA ICG-EL Virtual - NN\Production\Internal Controls for Grants Course Evaluation - 11023.0001.xlsx";
-            string evalpath = @"F:\BMRA_code\work_project\TestEnv\SF Eval Example 2.xlsx";
+/*            string evalpath = @"F:\BMRA_code\work_project\TestEnv\SF Eval Example 2.xlsx";
             string EOCpath = @"F:\BMRA_code\work_project\TestEnv\test";
             string type = "SalesForce";
             DateTime startDate = new DateTime(2023, 6, 20);
@@ -24,7 +24,7 @@ namespace cert_mailer
             FileInfo evalInfo = new FileInfo(evalpath);
             var attendance = "10";
             var courseABV = "TOM";
-            Evaluations eval = new Evaluations(evalInfo, EOCpath, type, "11023.0001", startDate, endDate, "J. Beverage", "CDC", "FPM 334", attendance, courseABV);
+            Evaluations eval = new Evaluations(evalInfo, EOCpath, type, "11023.0001", startDate, endDate, "J. Beverage", "CDC", "FPM 334", attendance, courseABV);*/
 
 /*            Stopwatch stopwatch = new Stopwatch();
 
