@@ -115,11 +115,6 @@ public class DataRead
             if (certPath.Equals("SD") && gradesGrade != null) {
                 gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
             }
-/*            else if (gradesGrade != null && !GradeCheck(gradesGrade))
-            {
-                gradeSkip++;
-                gradesGrade = gradesSheet.Cells[gradeSpacing + gradeSkip, 6].Value?.ToString();
-            }*/
 
             var gradesFirstName = gradesSheet.Cells[gradeSpacing + gradeSkip, 3].Value?.ToString();
             var gradesLastName = gradesSheet.Cells[gradeSpacing + gradeSkip, 5].Value?.ToString();
@@ -133,9 +128,58 @@ public class DataRead
             if (rosterType == 1)
             {
                 var rosterSpacing = row + BMRAROSTERSPACE;
-                rosterFirstName = rosterSheet.Cells[rosterSpacing, 2].Value?.ToString();
-                rosterLastName = rosterSheet.Cells[rosterSpacing, 3].Value?.ToString();
-                rosterEmail = rosterSheet.Cells[rosterSpacing, 4].Value?.ToString();
+
+                // Calculate the duration of the course and loop
+                DateTime courseStart = Course.StartDate;
+                DateTime courseEnd = Course.EndDate;
+                int dateRange = (courseEnd - courseStart).Days + 1;
+                DayOfWeek startDayOfWeek = courseStart.DayOfWeek;
+                // Map the days to their corresponding values.
+                int dayValue;
+                //bool absent = false;
+
+                // Switch statement to determine cell spacing for starting day
+                switch (startDayOfWeek)
+                {
+                    case DayOfWeek.Monday:
+                        dayValue = 5;
+                        break;
+                    case DayOfWeek.Tuesday:
+                        dayValue = 7;
+                        break;
+                    case DayOfWeek.Wednesday:
+                        dayValue = 9;
+                        break;
+                    case DayOfWeek.Thursday:
+                        dayValue = 11;
+                        break;
+                    case DayOfWeek.Friday:
+                        dayValue = 13;
+                        break;
+                    default:
+                        throw new InvalidOperationException("The date falls outside the Monday to Friday range.");
+                }
+
+                // Loop through each day
+                for (int date = 0; date < dateRange*2; date+=2)
+                {
+                    // If a student is absent for a day skip them.
+                    var cell = rosterSheet.Cells[rosterSpacing + skip, date + dayValue];
+                    var cellColor = cell.Style.Fill.BackgroundColor.Rgb;
+                    // Check if the color is not null and is red
+                    if (!string.IsNullOrEmpty(cellColor) && cellColor.Equals("FFFF0000", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //absent = true;
+                        skip++;
+                        date = 0;
+                    }
+                }
+
+                rosterFirstName = rosterSheet.Cells[rosterSpacing + skip, 2].Value?.ToString();
+                rosterLastName = rosterSheet.Cells[rosterSpacing + skip, 3].Value?.ToString();
+                rosterEmail = rosterSheet.Cells[rosterSpacing + skip, 4].Value?.ToString();
+
+
             }
             // VA roster
             else if (rosterType == 2)
