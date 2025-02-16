@@ -67,7 +67,6 @@ namespace cert_mailer
                 string? firstName = gradesSheet.Cells[gradeSpacing, 3].Value.ToString();
                 string? lastName = gradesSheet.Cells[gradeSpacing, 5].Value.ToString();
 
-                // string templatePath = @"C:\Users\Tommy\source\repos\Wingingbump\cert_mailer\Certificate of Training - Edit.docx"; // TEMP
                 // Create the output for the docs
                 string fullName = $"{firstName} {lastName}";
                 string outputPath = Path.Combine(certPath, $"{row:00} - {fullName} - Certificate of Training - {course.CourseNamingScheme}.docx");
